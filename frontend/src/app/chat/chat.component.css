@@ -1,17 +1,20 @@
 .container {
   margin-top: 50px;
   position: relative;
-  height: 500px;
+  height: 700px;
 }
 
 .chat-box {
-  height: 400px;
+  height: 650px;
   overflow-y: scroll;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #E8ECE5;
+  background-color: #E8ECE5;
+  border-radius: 10px;
   padding: 20px;
   position: absolute;
   width: 100%;
+  top: 0;
+
 }
 
 .input-group {
@@ -22,8 +25,8 @@
 
 .list-group-item {
   border-radius: 12px;
-  margin-bottom: 10px;
-  background-color: #f2f2f2;
+  margin-bottom: 5px;
+  background-color: #E8ECE5;
 }
 
 .list-group-item:last-child {
