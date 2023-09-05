@@ -15,7 +15,7 @@ export class LoginComponent {
   constructor(private router: Router, private http: HttpClient) { }
 
   login() {
-    this.http.post('/api/auth', { email: this.email, password: this.password }).subscribe(
+    this.http.post('http://localhost:3000/api/auth', { email: this.email, password: this.password }).subscribe(
       (response: any) => {
         if (response.valid) {
           sessionStorage.setItem('currentUser', JSON.stringify(response));

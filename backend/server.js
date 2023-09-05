@@ -1,12 +1,14 @@
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
+app.use(cors());
 app.use(bodyParser.json());
 
 const users = [
-    { username: 'user', email: 'user1@example.com', password: '123', role: 'user', valid: true },
+    { username: 'user', email: 'user', password: '123', role: 'user', valid: true },
     { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true },
     { username: 'super', email: 'superadmin@example.com', password: '123', role: 'super-admin', valid: true },
 
