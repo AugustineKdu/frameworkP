@@ -1,9 +1,15 @@
-<p>chat works!</p>
 <div class="container">
-  <h1>Chat Room</h1>
-  <div *ngFor="let message of messages">
-    {{ message }}
+  <div class="chat-box">
+    <ul class="list-group" id="message-list">
+      <li class="list-group-item" *ngFor="let message of messages">{{ message }}</li>
+    </ul>
   </div>
-  <input type="text" [(ngModel)]="newMessage">
-  <button (click)="sendMessage()">Send</button>
+  <form (submit)="sendMessage()">
+    <div class="input-group">
+      <input type="text" class="form-control" [(ngModel)]="message" name="message">
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Send</button>
+      </div>
+    </div>
+  </form>
 </div>

@@ -1,12 +1,31 @@
-.navbar {
-  font-size: 18px;
-  /* 글자 크기 */
-  border: 2px solid black;
-  /* 테두리 */
-  border-radius: 10px;
-  /* 둥근 테두리 */
-  padding: 10px;
-  /* 안쪽 여백 */
-  margin-bottom: 20px;
-  /* 아래 여백 */
+.custom-navbar {
+  background-color: #212121;
+}
+
+.navbar-brand,
+.nav-link,
+.btn {
+  color: #07ffb5;
+  font-size: 1.5em;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.btn-danger {
+
+  color: white;
+}
+
+.navbar-nav.ml-auto {
+  margin-right: 40px;
+}
+
+
+
+/* app.component.css */
+:host {
+  display: block;
+  background-color: #333333;
+  height: 100vh;
+  width: 100%;
 }

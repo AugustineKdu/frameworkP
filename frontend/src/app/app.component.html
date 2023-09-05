@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg custom-navbar">
   <a class="navbar-brand" href="#">Home</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
     aria-expanded="false" aria-label="Toggle navigation">
@@ -12,12 +12,13 @@
       <li class="nav-item">
         <a class="nav-link" routerLink="/account">Account</a>
       </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
       <li class="nav-item">
         <a class="nav-link" routerLink="/login">Login</a>
       </li>
+      <button *ngIf="isLoggedIn" class="btn btn-danger" (click)="logout()">Logout</button>
     </ul>
-
-    <button *ngIf="isLoggedIn" class="btn btn-danger ml-auto" (click)="logout()">Logout</button>
   </div>
 </nav>
 <router-outlet></router-outlet>
