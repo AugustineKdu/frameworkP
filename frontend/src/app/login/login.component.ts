@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -11,27 +12,32 @@ export class LoginComponent {
   password: string = '';
   errorMessage: string = '';
 
-  users = [
-    { email: 'super', password: '123', role: 'super-admin' },
-    { email: 'group', password: '123', role: 'group-admin' },
-    { email: 'user', password: '123', role: 'user' }
-  ];
-
-  constructor(private router: Router) { }
+  constructor(private router: Router, private http: HttpClient) { }
 
   login() {
-    const user = this.users.find(u => u.email === this.email && u.password === this.password);
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      if (user.role === 'super-admin') {
-        this.router.navigate(['/super-admin-dashboard']);
-      } else if (user.role === 'group-admin') {
-        this.router.navigate(['/group-admin-dashboard']);
-      } else {
-        this.router.navigate(['/dashboard']);
+    this.http.post('/api/auth', { email: this.email, password: this.password }).subscribe(
+      (response: any) => {
+        if (response.valid) {
+          sessionStorage.setItem('currentUser', JSON.stringify(response));
+          if (response.role === 'super-admin') {
+            this.router.navigate(['/super-admin-dashboard']);
+          } else if (response.role === 'group-admin') {
+            this.router.navigate(['/group-admin-dashboard']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+        } else {
+          this.errorMessage = 'Invalid email or password';
+        }
+      },
+      (error) => {
+        this.errorMessage = 'An error occurred';
       }
-    } else {
-      this.errorMessage = 'Invalid email or password';
-    }
+    );
+  }
+
+  logout() {
+    sessionStorage.clear();
+    this.router.navigate(['/login']);
   }
 }
