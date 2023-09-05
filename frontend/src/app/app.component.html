@@ -7,15 +7,17 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" routerLink="/login">Login</a>
+        <a class="nav-link" routerLink="/chat">Chat</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="/account">Account</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" routerLink="/chat">Chat</a>
+        <a class="nav-link" routerLink="/login">Login</a>
       </li>
     </ul>
+
+    <button *ngIf="isLoggedIn" class="btn btn-danger ml-auto" (click)="logout()">Logout</button>
   </div>
 </nav>
 <router-outlet></router-outlet>

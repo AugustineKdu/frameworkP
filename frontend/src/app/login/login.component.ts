@@ -35,7 +35,15 @@ export class LoginComponent {
       }
     );
   }
-
+  getDashboardRoute(role: string): string {
+    if (role === 'super-admin') {
+      return '/super-admin-dashboard';
+    } else if (role === 'group-admin') {
+      return '/group-admin-dashboard';
+    } else {
+      return '/dashboard';
+    }
+  }
   logout() {
     sessionStorage.clear();
     this.router.navigate(['/login']);

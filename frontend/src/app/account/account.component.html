@@ -1,11 +1,15 @@
 <p>account works!</p>
 <h1>Accounts Page</h1>
-<img src="path-to-your-image.jpg" alt="Describe the Image">
 
-<div *ngIf="user">
-  <h1>Welcome, {{ user.email }}</h1>
-  <p>ID: {{ user.email }}</p>
-  <p>Nickname: {{ user.email.split('@')[0] }}</p>
-  <p>Role: {{ user.role }}</p>
-  <p>Group: {{ user.group || 'None' }}</p>
+<div *ngIf="currentUser">
+  <h2>Your Account Details:</h2>
+  <ul>
+    <li><strong>Username:</strong> {{currentUser.username}}</li>
+    <li><strong>Email:</strong> {{currentUser.email}}</li>
+    <li><strong>Role:</strong> {{currentUser.role}}</li>
+  </ul>
+</div>
+
+<div *ngIf="!currentUser">
+  <p>You are not logged in. Please <a routerLink="/login">login</a> to view your account details.</p>
 </div>
