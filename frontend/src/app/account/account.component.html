@@ -1,3 +1,14 @@
 <p>account works!</p>
 <h1>Accounts Page</h1>
 <img src="path-to-your-image.jpg" alt="Describe the Image">
+
+<div *ngIf="user">
+  <h2>User Info</h2>
+  <ul>
+    <li><strong>Nickname:</strong> {{ user.nickname }}</li>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+    <li><strong>ID:</strong> {{ user.id }}</li>
+    <li><strong>Role:</strong> {{ user.role }}</li>
+    <li><strong>Group:</strong> {{ user.group }}</li>
+  </ul>
+</div>
