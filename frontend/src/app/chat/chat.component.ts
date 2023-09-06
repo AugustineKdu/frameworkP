@@ -18,7 +18,7 @@ export class ChatComponent implements OnInit {
   newMessage = '';
   chatGroups: ChatGroup[] = [];
   selectedGroup: ChatGroup | null = null;
-
+  currentUser: any = null; // 현재 사용자 정보를 저장할 변수
 
   constructor(private http: HttpClient) {
     this.socket = io('http://localhost:3000');
@@ -40,6 +40,12 @@ export class ChatComponent implements OnInit {
       this.chatGroups = groups;
       this.saveToLocalStorage();
     });
+
+    // Load current user from session storage
+    const user = sessionStorage.getItem('currentUser');
+    if (user) {
+      this.currentUser = JSON.parse(user);
+    }
   }
 
   selectGroup(groupId: number): void {
@@ -48,34 +54,54 @@ export class ChatComponent implements OnInit {
       this.socket.emit('joinRoom', groupId);
     }
   }
-
   addGroup() {
-    const groupName = prompt('Enter new group name:');
-    if (groupName) {
-      this.http.post<ChatGroup>('http://localhost:3000/api/chat-groups', { name: groupName }).subscribe((newGroup) => {
-        this.chatGroups.push(newGroup);
-        this.saveToLocalStorage();
-
-      });
+    if (this.currentUser) {
+      if (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin') {
+        const groupName = prompt('Enter new group name:');
+        if (groupName) {
+          this.http.post<ChatGroup>('http://localhost:3000/api/chat-groups', { name: groupName }).subscribe((newGroup) => {
+            this.chatGroups.push(newGroup);
+            this.saveToLocalStorage();
+          });
+        }
+      } else {
+        alert('You do not have permission to add a group.');
+      }
+    } else {
+      alert('You are not logged in.');
     }
   }
 
   deleteGroup(groupId: number) {
-    this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
-      const index = this.chatGroups.findIndex(group => group.id === groupId);
-      if (index !== -1) {
-        this.chatGroups.splice(index, 1);
-        this.saveToLocalStorage();
+    if (this.currentUser) {
+      if (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin') {
+        this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
+          const index = this.chatGroups.findIndex(group => group.id === groupId);
+          if (index !== -1) {
+            this.chatGroups.splice(index, 1);
+            this.saveToLocalStorage();
+          }
+        });
+      } else {
+        alert('You do not have permission to delete a group.');
       }
-    });
-  }
-
-  sendMessage(): void {
-    if (this.selectedGroup) {
-      this.socket.emit('send message', { message: this.newMessage, roomId: this.selectedGroup.id });
-      this.newMessage = '';
+    } else {
+      alert('You are not logged in.');
     }
   }
+
+
+  sendMessage(): void {
+    if (this.currentUser) {
+      if (this.selectedGroup) {
+        this.socket.emit('send message', { message: this.newMessage, roomId: this.selectedGroup.id });
+        this.newMessage = '';
+      }
+    } else {
+      alert('You must be logged in to send a message.');
+    }
+  }
+
 
   saveToLocalStorage(): void {
     localStorage.setItem('chatGroups', JSON.stringify(this.chatGroups));
@@ -86,4 +112,3 @@ export class ChatComponent implements OnInit {
     return storedGroups ? JSON.parse(storedGroups) : [];
   }
 }
-

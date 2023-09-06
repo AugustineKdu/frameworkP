@@ -15,7 +15,7 @@ export class LoginComponent {
   constructor(private router: Router, private http: HttpClient) { }
 
   login() {
-    this.http.post('http://localhost:3000/api/auth', { username: this.username, password: this.password })  // email 대신 username 사용
+    this.http.post('http://localhost:3000/api/auth', { username: this.username, password: this.password })
       .subscribe(
         (response: any) => {
           if (response.valid) {
