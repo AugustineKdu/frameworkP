@@ -1,16 +1,31 @@
-// ------------------------- Server Part -------------------------
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const http = require('http');
 const socketIO = require('socket.io');
+const fs = require('fs');  // Import the file system module
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Function to load data from JSON file when the server starts
+function loadDataFromFile() {
+    try {
+        const jsonData = fs.readFileSync('chatGroups.json', 'utf-8');
+        chatGroups = JSON.parse(jsonData);
+    } catch (error) {
+        console.log("Could not load data from file:", error);
+    }
+}
+
+// Function to save data to JSON file
+function saveDataToFile() {
+    const jsonData = JSON.stringify(chatGroups);
+    fs.writeFileSync('chatGroups.json', jsonData);
+}
 
 // User authentication data
 const users = [
@@ -22,7 +37,7 @@ const users = [
 // Authentication API
 app.post('/api/auth', (req, res) => {
     const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);  // email 대신 username 사용
+    const user = users.find(u => u.username === username && u.password === password);
     if (user) {
         res.json({
             valid: true,
@@ -35,14 +50,11 @@ app.post('/api/auth', (req, res) => {
     }
 });
 
-
-// ------------------------- Chat Part -------------------------
-
 // Chat group data
-let chatGroups = [
-    { id: 1, name: 'Group 1', messages: [] },
-    { id: 2, name: 'Group 2', messages: [] }
-];
+let chatGroups = [];
+
+// Load data from file on server start
+loadDataFromFile();
 
 // API to get all chat groups
 app.get('/api/chat-groups', (req, res) => {
@@ -57,6 +69,7 @@ app.post('/api/chat-groups', (req, res) => {
         messages: []
     };
     chatGroups.push(newGroup);
+    saveDataToFile();  // Save updated data to file
     res.json(newGroup);
 });
 
@@ -66,11 +79,13 @@ app.delete('/api/chat-groups/:id', (req, res) => {
     const index = chatGroups.findIndex(group => group.id === id);
     if (index !== -1) {
         chatGroups.splice(index, 1);
+        saveDataToFile();  // Save updated data to file
         res.json({ success: true });
     } else {
         res.status(404).json({ success: false });
     }
 });
+
 const server = http.Server(app);
 
 // Socket.io for real-time chat

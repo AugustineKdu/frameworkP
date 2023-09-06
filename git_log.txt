@@ -1,0 +1,78 @@
+Augustinekim frameworkP % git log
+commit 608ff6135c9afb5e1134a74bb34ea76f34390118 (HEAD -> main, origin/main, origin/HEAD)
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 03:31:25 2023 +1000
+
+    add the access function on chat
+
+commit 748a9606feaeaaf65385024815333fc74986cb47
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 03:25:46 2023 +1000
+
+    change dashboard html and account detail view code
+
+commit 9bd05b5015d130c15bf07a920f4935b8d6b6ef5b
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 01:54:33 2023 +1000
+
+    change the css and html
+
+commit 8ea96504314bdce4020fc89b2c4cb15e808a9e64
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 00:12:33 2023 +1000
+
+     add the all function(chatbox and chat group)
+
+commit c4ed0c9d03a1f2251b7ee8cd5da727037dcd9995
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 05:10:03 2023 +1000
+
+    build chat component desgin
+
+commit f0126d21e6f0f7e26e955dfd551cd4627b52a7ec
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 04:42:50 2023 +1000
+
+    change the app.component html and css
+
+commit 94eaaedcf63741e16f8b8f423610a34761b54dd3
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 03:18:36 2023 +1000
+
+    add dashboard rout after login
+
+commit 6b6aff2e94a8eb55bc3c04c83383efec06244fcb
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 01:30:02 2023 +1000
+
+    fix the connect node server.js error
+
+commit 059262b16038a0f391bff70cb3fd885583f1508c
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 00:52:36 2023 +1000
+
+     connection error occur point
+
+commit 23852cb193dac196b17e743aa58e4d28fded3669
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Wed Sep 6 00:22:37 2023 +1000
+
+     connect node server.js with Angular
+
+commit 49f6878b0687ea01f9f3f3c854275d396101a926
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Tue Sep 5 20:26:56 2023 +1000
+
+    before connect nodejs
+
+commit 20f6406f7b9ef0f0718094ba7aaa36e18eac4eb4
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Tue Sep 5 19:59:26 2023 +1000
+
+     setting Angular(chat, login, and admin dashboard component)
+
+commit b82bf805169207294a95d52355b257381329578b
+Author: Augustine <110144480+AugustineKdu@users.noreply.github.com>
+Date:   Tue Sep 5 18:41:59 2023 +1000
+
+    Initial commit
