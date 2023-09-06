@@ -5,6 +5,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const fs = require('fs');  // Import the file system module
 
+fs.writeFileSync('chatGroups.json', '[]');
 const app = express();
 const port = 3000;
 
