@@ -1,15 +1,23 @@
 <div class="container">
-  <div class="chat-box">
-    <ul class="list-group" id="message-list">
-      <li class="list-group-item" *ngFor="let message of messages">{{ message }}</li>
+  <div class="sidebar" style="width: 30%;">
+    <button (click)="addGroup()">Add Group</button>
+    <ul>
+      <li *ngFor="let group of chatGroups">
+        <span (click)="selectGroup(group.id)">{{ group.name }}</span>
+        <button (click)="deleteGroup(group.id)">Delete</button>
+      </li>
     </ul>
   </div>
-  <form (submit)="sendMessage()">
-    <div class="input-group">
-      <input type="text" class="form-control" [(ngModel)]="message" name="message">
-      <div class="input-group-append">
-        <button class="btn btn-primary" type="submit">Send</button>
+  <div class="chat-window" style="width: 70%;">
+    <h2 *ngIf="selectedGroup">{{ selectedGroup.name }}</h2>
+    <div class="messages">
+      <div *ngFor="let message of selectedGroup?.messages">
+        {{ message.content }}
       </div>
     </div>
-  </form>
+    <div class="input-area">
+      <input [(ngModel)]="newMessage" placeholder="Type a message...">
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </div>
 </div>

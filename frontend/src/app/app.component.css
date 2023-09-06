@@ -1,7 +1,9 @@
+/* Custom Navbar */
 .custom-navbar {
   background-color: #212121;
 }
 
+/* Navbar items */
 .navbar-brand,
 .nav-link,
 .btn {
@@ -11,21 +13,21 @@
   margin-right: 20px;
 }
 
+/* Logout Button */
 .btn-danger {
-
   color: white;
 }
 
+/* Right Aligned Navigation Items */
 .navbar-nav.ml-auto {
   margin-right: 40px;
 }
-
 
 
 /* app.component.css */
 :host {
   display: block;
   background-color: #6A7B8B;
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }

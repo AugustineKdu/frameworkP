@@ -1,35 +1,28 @@
 .container {
-  margin-top: 50px;
-  position: relative;
-  height: 700px;
+  display: flex;
 }
 
-.chat-box {
-  height: 650px;
+.sidebar {
+  border-right: 1px solid #ccc;
+  padding: 10px;
+}
+
+.chat-window {
+  padding: 10px;
+}
+
+.messages {
+  height: 400px;
   overflow-y: scroll;
-  border: 1px solid #E8ECE5;
-  background-color: #E8ECE5;
-  border-radius: 10px;
-  padding: 20px;
-  position: absolute;
-  width: 100%;
-  top: 0;
-
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
-.input-group {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+.input-area {
+  display: flex;
 }
 
-.list-group-item {
-  border-radius: 12px;
-  margin-bottom: 5px;
-  background-color: #E8ECE5;
-}
-
-.list-group-item:last-child {
-  background-color: #0099ff;
-  color: white;
+.input-area input {
+  flex: 1;
 }

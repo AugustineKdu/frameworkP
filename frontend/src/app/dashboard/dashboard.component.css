@@ -1,28 +1,22 @@
-.dashboard {
+.container {
   display: flex;
-  background-color: #f3f4f6;
-}
-
-.sidebar {
-  width: 20%;
-  background-color: #333;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+  background-color: #333333;
   color: white;
+}
+
+.left {
+  flex: 1;
   padding: 20px;
 }
 
-.main-content {
-  width: 80%;
-  padding: 20px;
+.right {
+  flex: 1;
+  text-align: center;
 }
 
-.card {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card h3 {
-  margin-top: 0;
+#clock {
+  font-size: 48px;
 }
