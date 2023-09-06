@@ -19,6 +19,7 @@ export class ChatComponent implements OnInit {
   chatGroups: ChatGroup[] = [];
   selectedGroup: ChatGroup | null = null;
 
+
   constructor(private http: HttpClient) {
     this.socket = io('http://localhost:3000');
 
@@ -54,6 +55,7 @@ export class ChatComponent implements OnInit {
       this.http.post<ChatGroup>('http://localhost:3000/api/chat-groups', { name: groupName }).subscribe((newGroup) => {
         this.chatGroups.push(newGroup);
         this.saveToLocalStorage();
+
       });
     }
   }
