@@ -8,6 +8,7 @@
 4. [Node Server Architecture]
 5. [Server-Side Routes]
 6. [Client-Server Interaction]
+7. [Data Persistence]
 
 ---
 
@@ -21,12 +22,14 @@
 
 ### Update Frequency
 Commits are made at the end of each completed feature or bug fix.
+
 ---
 
 ## Data Structures
 ### Client-Side
 - **User**: Represents a user in the system. Fields include `username`, `email`, `role`, and `valid`.
 - **ChatGroup**: Represents a chat group. Fields include `id`, `name`, and `messages`.
+
 ### Server-Side
 - **users**: An array of user objects for authentication. Each object includes `username`, `email`, `password`, `role`, and `valid`.
 - **chatGroups**: An array of chat group objects, each containing an array of messages.
@@ -36,9 +39,9 @@ Commits are made at the end of each completed feature or bug fix.
 ## Angular Architecture
 
 - **Components**: `ChatComponent`, `LoginComponent`, `AccountComponent`, `DashboardComponent`, `SuperAdminDashboardComponent`, `GroupAdminDashboardComponent`
-- **Services**: `AuthService` for authentication, `ChatService` for chat functionalities.
+- **Services**:  `ChatService` for chat functionalities.
 - **Models**: `User`, `ChatGroup`
-- **Routes**: Defined in `AppRoutingModule`, includes routes for login, account management, dashboards, and chat.
+- **Routes**: Defined in `AppRoutingModule`, includes routes for login, account management, dashboards, and chat. The home screen uses the `DashboardComponent`, which varies based on the user's role (super-admin, group-admin, or user).
 
 ---
 
@@ -87,4 +90,11 @@ Commits are made at the end of each completed feature or bug fix.
 - When a user joins a chat group, the `joinRoom` event is emitted from the client to the server.
 - The server then updates the user's current chat group and broadcasts any new messages to that group.
 - The Angular `ChatComponent` listens for these messages and updates its display when a new message is received.
+
+---
+
+## Data Persistence
+
+- The server uses JSON files to persistently store the state of chat groups.
+- Data is loaded from the JSON file when the server starts and saved back to the JSON file whenever there are changes to the chat groups.
 
