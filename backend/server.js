@@ -21,8 +21,8 @@ const users = [
 
 // Authentication API
 app.post('/api/auth', (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email && u.password === password);
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username && u.password === password);  // email 대신 username 사용
     if (user) {
         res.json({
             valid: true,
@@ -34,6 +34,7 @@ app.post('/api/auth', (req, res) => {
         res.status(401).json({ valid: false });
     }
 });
+
 
 // ------------------------- Chat Part -------------------------
 

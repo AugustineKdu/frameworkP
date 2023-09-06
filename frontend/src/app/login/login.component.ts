@@ -8,33 +8,29 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  email: string = '';
+  username: string = '';
   password: string = '';
   errorMessage: string = '';
 
   constructor(private router: Router, private http: HttpClient) { }
 
   login() {
-    this.http.post('http://localhost:3000/api/auth', { email: this.email, password: this.password }).subscribe(
-      (response: any) => {
-        if (response.valid) {
-          sessionStorage.setItem('currentUser', JSON.stringify(response));
-          if (response.role === 'super-admin') {
-            this.router.navigate(['/super-admin-dashboard']);
-          } else if (response.role === 'group-admin') {
-            this.router.navigate(['/group-admin-dashboard']);
+    this.http.post('http://localhost:3000/api/auth', { username: this.username, password: this.password })  // email 대신 username 사용
+      .subscribe(
+        (response: any) => {
+          if (response.valid) {
+            sessionStorage.setItem('currentUser', JSON.stringify(response));
+            this.router.navigate([this.getDashboardRoute(response.role)]);
           } else {
-            this.router.navigate(['/dashboard']);
+            this.errorMessage = 'Invalid username or password';
           }
-        } else {
-          this.errorMessage = 'Invalid email or password';
+        },
+        (error) => {
+          this.errorMessage = 'An error occurred';
         }
-      },
-      (error) => {
-        this.errorMessage = 'An error occurred';
-      }
-    );
+      );
   }
+
   getDashboardRoute(role: string): string {
     if (role === 'super-admin') {
       return '/super-admin-dashboard';

@@ -1,0 +1,41 @@
+.account-container {
+  padding: 20px;
+  background-color: #f2f2f2;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.account-details {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-details h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.account-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.account-details ul li {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.not-logged-in {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+.not-logged-in a {
+  color: blue;
+  text-decoration: underline;
+}

@@ -1,40 +1,18 @@
-<p>dashboard works!</p>
-<div class="container">
-  <h1>Welcome to Dashboard</h1>
-  <p>This is your dashboard, where you can see your account details and messages.</p>
-</div>
-
-<div class="container">
-  <div class="left">
-    <h1>Welcome to Our Chat</h1>
-    <p>Connect with people around the world.</p>
-    <p>Your messages are encrypted and safe.</p>
+<div class="home-container">
+  <div class="header">
+    <h1>Welcome to Our Chat Project</h1>
   </div>
-  <div class="right">
-    <div id="clock">
-      <span id="hour"></span>:
-      <span id="minute"></span>:
-      <span id="second"></span>
-    </div>
+  <div class="content">
+    <p>This is a chat application that allows you to communicate with friends, family, and colleagues in real-time.</p>
+    <h2>Features:</h2>
+    <ul>
+      <li>Real-time Messaging</li>
+      <li>Group Chats</li>
+      <li>Role-based Access Control</li>
+      <li>And much more...</li>
+    </ul>
+  </div>
+  <div class="footer">
+    <p>Start chatting today!</p>
   </div>
 </div>
-
-<script src="script.js">
-  function updateClock() {
-    const now = new Date();
-    const hour = now.getHours().toString().padStart(2, '0');
-    const minute = now.getMinutes().toString().padStart(2, '0');
-    const second = now.getSeconds().toString().padStart(2, '0');
-
-    document.getElementById('hour').textContent = hour;
-    document.getElementById('minute').textContent = minute;
-    document.getElementById('second').textContent = second;
-  }
-
-  // Update the clock immediately
-  updateClock();
-
-  // Then update it every second
-  setInterval(updateClock, 1000);
-
-</script>

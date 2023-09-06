@@ -1,15 +1,19 @@
-<p>account works!</p>
-<h1>Accounts Page</h1>
+<div class="account-container">
+  <h1>Accounts Page</h1>
+  <div class="account-details" *ngIf="currentUser">
+    <h2>Your Account Details:</h2>
+    <ul>
+      <li><strong>Username:</strong> {{currentUser.username}}</li>
+      <li><strong>Email:</strong> {{currentUser.email}}</li>
+      <li><strong>Role:</strong> {{currentUser.role}}</li>
+    </ul>
 
-<div *ngIf="currentUser">
-  <h2>Your Account Details:</h2>
-  <ul>
-    <li><strong>Username:</strong> {{currentUser.username}}</li>
-    <li><strong>Email:</strong> {{currentUser.email}}</li>
-    <li><strong>Role:</strong> {{currentUser.role}}</li>
-  </ul>
-</div>
-
-<div *ngIf="!currentUser">
-  <p>You are not logged in. Please <a routerLink="/login">login</a> to view your account details.</p>
+    <ul>
+      <p><strong>Your Permissions:</strong></p>
+      <li *ngFor="let role of userRoles">{{ role }}</li>
+    </ul>
+  </div>
+  <div class="not-logged-in" *ngIf="!currentUser">
+    <p>You are not logged in. Please <a routerLink="/login">login</a> to view your account details.</p>
+  </div>
 </div>
