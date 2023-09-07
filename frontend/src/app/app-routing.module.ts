@@ -6,6 +6,7 @@ import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admi
 import { GroupAdminDashboardComponent } from './group-admin-dashboard/group-admin-dashboard.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ChatComponent } from './chat/chat.component';
+import { SignupComponent } from './signup/signup.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -14,7 +15,8 @@ const routes: Routes = [
   { path: 'super-admin-dashboard', component: SuperAdminDashboardComponent },
   { path: 'group-admin-dashboard', component: GroupAdminDashboardComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'chat', component: ChatComponent }
+  { path: 'chat', component: ChatComponent },
+  { path: 'signup', component: SignupComponent }
 ];
 
 @NgModule({

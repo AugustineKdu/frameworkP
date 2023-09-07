@@ -1,5 +1,54 @@
-Augustinekim frameworkP % git log
-commit 608ff6135c9afb5e1134a74bb34ea76f34390118 (HEAD -> main, origin/main, origin/HEAD)
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:47:46 2023 +1000
+
+    update the readme file(documentation)& on the code
+
+commit 004124695894205aae51b7737f031abfeff7584b
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:39:23 2023 +1000
+
+    add the chat component ts to connect with local json file and documentation on code
+
+commit f71009cf9d85797958ada5043f5e35ad483cf138
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:31:33 2023 +1000
+
+    add the code for create the json file
+
+commit 26a0215fa73e7bd659aebce19aa4c0ba78e6a7aa
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:27:50 2023 +1000
+
+    add the function to save data to JSON file
+
+commit 608ff6135c9afb5e1134a74bb34ea76f34390118
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+:...skipping...
+commit b7736ec95aead503d318851e4f7c19e69bee456b (HEAD -> main, origin/main, origin/HEAD)
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:47:46 2023 +1000
+
+    update the readme file(documentation)& on the code
+
+commit 004124695894205aae51b7737f031abfeff7584b
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:39:23 2023 +1000
+
+    add the chat component ts to connect with local json file and documentation on code
+
+commit f71009cf9d85797958ada5043f5e35ad483cf138
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:31:33 2023 +1000
+
+    add the code for create the json file
+
+commit 26a0215fa73e7bd659aebce19aa4c0ba78e6a7aa
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 05:27:50 2023 +1000
+
+    add the function to save data to JSON file
+
+commit 608ff6135c9afb5e1134a74bb34ea76f34390118
 Author: Augustine <augustine.kim@griffithuni.edu.au>
 Date:   Thu Sep 7 03:31:25 2023 +1000
 
@@ -61,18 +110,4 @@ Date:   Wed Sep 6 00:22:37 2023 +1000
 
 commit 49f6878b0687ea01f9f3f3c854275d396101a926
 Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Tue Sep 5 20:26:56 2023 +1000
-
-    before connect nodejs
-
-commit 20f6406f7b9ef0f0718094ba7aaa36e18eac4eb4
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Tue Sep 5 19:59:26 2023 +1000
-
-     setting Angular(chat, login, and admin dashboard component)
-
-commit b82bf805169207294a95d52355b257381329578b
-Author: Augustine <110144480+AugustineKdu@users.noreply.github.com>
-Date:   Tue Sep 5 18:41:59 2023 +1000
-
-    Initial commit
+:

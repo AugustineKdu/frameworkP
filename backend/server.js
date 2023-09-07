@@ -6,6 +6,8 @@ const socketIO = require('socket.io');
 const fs = require('fs');  // Import the file system module
 
 fs.writeFileSync('chatGroups.json', '[]');
+fs.writeFileSync('.json', '[]');
+
 const app = express();
 const port = 3000;
 
@@ -120,6 +122,17 @@ io.on('connection', (socket) => {
         }
     });
 });
+
+
+// Signup API
+app.post('/api/signup', (req, res) => {
+    const { username, email, password, role } = req.body;
+    const newUser = { username, email, password, role, valid: true };
+    users.push(newUser);
+    saveUsers();  // <-- Save updated users to JSON file
+    res.json(newUser);
+});
+
 
 server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

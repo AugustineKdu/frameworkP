@@ -11,6 +11,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ChatComponent } from './chat/chat.component';
 import { SuperAdminDashboardComponent } from './super-admin-dashboard/super-admin-dashboard.component';
 import { GroupAdminDashboardComponent } from './group-admin-dashboard/group-admin-dashboard.component';
+import { SignupComponent } from './signup/signup.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { GroupAdminDashboardComponent } from './group-admin-dashboard/group-admi
     DashboardComponent,
     ChatComponent,
     SuperAdminDashboardComponent,
-    GroupAdminDashboardComponent
+    GroupAdminDashboardComponent,
+    SignupComponent
   ],
   imports: [
     BrowserModule,
