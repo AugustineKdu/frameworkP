@@ -7,9 +7,11 @@ const fs = require('fs');
 
 // Initialize JSON files
 const initialChatGroups = JSON.stringify([
-    { id: 1, name: 'General', messages: [] },
-    { id: 2, name: 'Random', messages: [] }
+    { id: 1, name: 'General', messages: [], usernames: ['user', 'group', 'super'] },
+    { id: 2, name: 'Random', messages: [], usernames: ['user', 'group', 'super'] }
 ]);
+fs.writeFileSync('chatGroups.json', initialChatGroups);
+
 fs.writeFileSync('chatGroups.json', initialChatGroups);
 
 fs.writeFileSync('users.json', JSON.stringify([
@@ -37,12 +39,12 @@ function loadDataFromFile() {
     }
 }
 
-
 // Function to save data to JSON files
 function saveDataToFile() {
     fs.writeFileSync('chatGroups.json', JSON.stringify(chatGroups));
     fs.writeFileSync('users.json', JSON.stringify(users));
 }
+
 
 // Load data from files on server start
 loadDataFromFile();
@@ -88,11 +90,24 @@ app.post('/api/chat-groups', (req, res) => {
     const newGroup = {
         id: chatGroups.length + 1,
         name: req.body.name,
-        messages: []
+        messages: [],
+        usernames: req.body.usernames || []
     };
     chatGroups.push(newGroup);
-    saveDataToFile();  // Save updated data to file
+    saveDataToFile();
     res.json(newGroup);
+});
+
+// API to get all users with their chat groups
+app.get('/api/users', (req, res) => {
+    const usersWithGroups = users.map(user => {
+        const groups = chatGroups.filter(group => group.usernames.includes(user.username));
+        return {
+            ...user,
+            groups: groups.map(group => ({ id: group.id, name: group.name }))
+        };
+    });
+    res.json(usersWithGroups);
 });
 
 // API to delete a chat group
@@ -145,6 +160,17 @@ io.on('connection', (socket) => {
 app.get('/api/users', (req, res) => {
     res.json(users);
 });
+// API to get all users with their chat groups
+app.get('/api/users', (req, res) => {
+    const usersWithGroups = users.map(user => {
+        const groups = chatGroups.filter(group => group.usernames.includes(user.username));  // Change 'members' to 'usernames'
+        return {
+            ...user,
+            groups: groups.map(group => ({ id: group.id, name: group.name }))
+        };
+    });
+    res.json(usersWithGroups);
+});
 app.put('/api/users/:id/role', (req, res) => {
     const id = parseInt(req.params.id);
     const { newRole } = req.body;
@@ -177,6 +203,35 @@ app.put('/api/users/:id', (req, res) => {
         user.role = role;
         saveDataToFile();  // Save updated users to JSON file
         res.json({ success: true, role });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+
+// API to add a user to a chat group
+app.put('/api/chat-groups/:id/add-user', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { username } = req.body;
+    const group = chatGroups.find(group => group.id === id);
+    if (group && !group.usernames.includes(username)) {
+        group.usernames.push(username);
+        saveDataToFile();
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+
+// API to remove a user from a chat group
+app.put('/api/chat-groups/:id/remove-user', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { username } = req.body;
+    const group = chatGroups.find(group => group.id === id);
+    if (group && group.usernames.includes(username)) {
+        const index = group.usernames.indexOf(username);
+        group.usernames.splice(index, 1);
+        saveDataToFile();
+        res.json({ success: true });
     } else {
         res.status(404).json({ success: false });
     }

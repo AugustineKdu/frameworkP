@@ -12,6 +12,7 @@ interface ChatGroup {
   id: number;
   name: string;
   messages: { content: string }[];
+  usernames: string[];
 }
 
 @Component({
@@ -36,6 +37,7 @@ export class SuperAdminDashboardComponent implements OnInit {
       this.chatGroups = data;
     });
   }
+
 
   // Delete a user by their ID
   deleteUser(userId: number) {
@@ -65,4 +67,40 @@ export class SuperAdminDashboardComponent implements OnInit {
       this.chatGroups = this.chatGroups.filter(group => group.id !== groupId);
     });
   }
+
+  // Add a user to a chat group
+  addUserToChatGroup(groupId: number, username: string) {
+    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/add-user`, { username })
+      .subscribe(
+        (response) => {
+          const group = this.chatGroups.find(g => g.id === groupId);
+          if (group) {
+            group.usernames.push(username);
+          }
+        },
+        (error) => {
+          console.log('An error occurred', error);
+        }
+      );
+  }
+
+  // Remove a user from a chat group
+  removeUserFromChatGroup(groupId: number, username: string) {
+    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/remove-user`, { username })
+      .subscribe(
+        (response) => {
+          const group = this.chatGroups.find(g => g.id === groupId);
+          if (group) {
+            const index = group.usernames.indexOf(username);
+            if (index > -1) {
+              group.usernames.splice(index, 1);
+            }
+          }
+        },
+        (error) => {
+          console.log('An error occurred', error);
+        }
+      );
+  }
+
 }

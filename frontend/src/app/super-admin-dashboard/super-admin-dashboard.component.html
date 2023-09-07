@@ -24,7 +24,6 @@
             <option value="group-admin">Group Admin</option>
             <option value="super-admin">Super Admin</option>
           </select>
-
         </td>
         <td>
           <button (click)="deleteUser(user.id)">Delete</button>
@@ -32,6 +31,7 @@
       </tr>
     </tbody>
   </table>
+
   <!-- Chat Group Table -->
   <h2>Chat Groups</h2>
   <table border="1">
@@ -40,6 +40,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>Messages</th>
+        <th>Users</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -49,9 +50,37 @@
         <td>{{ group.name }}</td>
         <td>{{ group.messages.length }}</td>
         <td>
-          <button (click)="deleteChatGroup(group.id)">Delete</button>
+          <ul>
+            <li *ngFor="let username of group.usernames">
+              {{ username }}
+            </li>
+          </ul>
+        </td>
+        <td>
+          <!-- Add User to Group -->
+          <input #usernameAddInput type="text" placeholder="Username to add">
+          <button (click)="addUserToChatGroup(group.id, usernameAddInput.value)">Add User</button>
+
+          <!-- Remove User from Group -->
+          <input #usernameRemoveInput type="text" placeholder="Username to remove">
+          <button (click)="removeUserFromChatGroup(group.id, usernameRemoveInput.value)">Remove User</button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <!-- Delete Chat Group Section -->
+  <h2>Delete Chat Groups</h2>
+  <table border="1">
+    <tbody>
+      <tr *ngFor="let group of chatGroups; let i = index">
+        <td>{{ group.name }}</td>
+        <td><button (click)="deleteChatGroup(group.id)">Delete</button></td>
+        <ng-container *ngIf="(i + 1) % 2 === 0"> <!-- Close the row every 2 items -->
+
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+
 </div>
