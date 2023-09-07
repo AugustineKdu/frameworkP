@@ -1,6 +1,6 @@
 <div class="signup-container">
   <h1>Sign Up</h1>
-  <form (submit)="registerUser()">
+  <form (submit)="signup()">
     <div class="input-group">
       <label for="username">Username</label>
       <input type="text" id="username" [(ngModel)]="username" name="username" required>
@@ -13,11 +13,12 @@
       <label for="password">Password</label>
       <input type="password" id="password" [(ngModel)]="password" name="password" required>
       <label for="role">Role:</label>
-      <select id="role" [(ngModel)]="role">
+      <select [(ngModel)]="role" name="role">
         <option value="user">User</option>
         <option value="group-admin">Group Admin</option>
         <option value="super-admin">Super Admin</option>
       </select>
+
     </div>
     <button type="submit">Register</button>
   </form>

@@ -1,0 +1,1 @@
+[{"username":"user","email":"user@example.com","password":"123","role":"user","valid":true},{"username":"group","email":"groupadmin@example.com","password":"123","role":"group-admin","valid":true},{"username":"super","email":"superadmin@example.com","password":"123","role":"super-admin","valid":true}]

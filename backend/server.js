@@ -3,10 +3,20 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const http = require('http');
 const socketIO = require('socket.io');
-const fs = require('fs');  // Import the file system module
+const fs = require('fs');
 
-fs.writeFileSync('chatGroups.json', '[]');
-fs.writeFileSync('.json', '[]');
+// Initialize JSON files
+const initialChatGroups = JSON.stringify([
+    { id: 1, name: 'General', messages: [] },
+    { id: 2, name: 'Random', messages: [] }
+]);
+fs.writeFileSync('chatGroups.json', initialChatGroups);
+
+fs.writeFileSync('users.json', JSON.stringify([
+    { username: 'user', email: 'user@example.com', password: '123', role: 'user', valid: true },
+    { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true },
+    { username: 'super', email: 'superadmin@example.com', password: '123', role: 'super-admin', valid: true },
+]));
 
 const app = express();
 const port = 3000;
@@ -14,28 +24,28 @@ const port = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Function to load data from JSON file when the server starts
+let chatGroups = [];
+let users = [];
+
+// Function to load data from JSON files
 function loadDataFromFile() {
     try {
-        const jsonData = fs.readFileSync('chatGroups.json', 'utf-8');
-        chatGroups = JSON.parse(jsonData);
+        chatGroups = JSON.parse(fs.readFileSync('chatGroups.json', 'utf-8'));
+        users = JSON.parse(fs.readFileSync('users.json', 'utf-8'));
     } catch (error) {
         console.log("Could not load data from file:", error);
     }
 }
 
-// Function to save data to JSON file
+
+// Function to save data to JSON files
 function saveDataToFile() {
-    const jsonData = JSON.stringify(chatGroups);
-    fs.writeFileSync('chatGroups.json', jsonData);
+    fs.writeFileSync('chatGroups.json', JSON.stringify(chatGroups));
+    fs.writeFileSync('users.json', JSON.stringify(users));
 }
 
-// User authentication data
-const users = [
-    { username: 'user', email: 'user@example.com', password: '123', role: 'user', valid: true },
-    { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true },
-    { username: 'super', email: 'superadmin@example.com', password: '123', role: 'super-admin', valid: true },
-];
+// Load data from files on server start
+loadDataFromFile();
 
 // Authentication API
 app.post('/api/auth', (req, res) => {
@@ -53,8 +63,17 @@ app.post('/api/auth', (req, res) => {
     }
 });
 
-// Chat group data
-let chatGroups = [];
+
+// Signup API
+app.post('/api/signup', (req, res) => {
+    const { username, email, password, role } = req.body;
+    const newUser = { username, email, password, role, valid: true };
+    users.push(newUser);
+    saveDataToFile();  // Save updated users to JSON file
+    res.json(newUser);
+});
+
+
 
 // Load data from file on server start
 loadDataFromFile();
@@ -122,17 +141,49 @@ io.on('connection', (socket) => {
         }
     });
 });
-
-
-// Signup API
-app.post('/api/signup', (req, res) => {
-    const { username, email, password, role } = req.body;
-    const newUser = { username, email, password, role, valid: true };
-    users.push(newUser);
-    saveUsers();  // <-- Save updated users to JSON file
-    res.json(newUser);
+//control the data on super-admin-Dashboard
+app.get('/api/users', (req, res) => {
+    res.json(users);
+});
+app.put('/api/users/:id/role', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { newRole } = req.body;
+    const user = users.find(u => u.id === id);
+    if (user) {
+        user.role = newRole;
+        saveDataToFile();
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+app.delete('/api/users/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = users.findIndex(u => u.id === id);
+    if (index !== -1) {
+        users.splice(index, 1);
+        saveDataToFile();
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+// Change a user's role
+app.put('/api/users/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const { role } = req.body;
+    const user = users.find(u => u.id === id);
+    if (user) {
+        user.role = role;
+        saveDataToFile();  // Save updated users to JSON file
+        res.json({ success: true, role });
+    } else {
+        res.status(404).json({ success: false });
+    }
 });
 
+
+saveDataToFile();
 
 server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);

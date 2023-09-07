@@ -11,26 +11,27 @@ export class SignupComponent {
   username: string = '';
   email: string = '';
   password: string = '';
-  role: string = 'user';  // Default role
+  role: string = 'user';
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  registerUser() {
-    this.http.post('http://localhost:3000/api/signup', {
-      username: this.username,
-      email: this.email,
-      password: this.password,
-      role: this.role  // Include role in the POST request
-    })
+  signup() {
+    console.log(this.role);
+    this.http.post('http://localhost:3000/api/signup', { username: this.username, email: this.email, password: this.password, role: this.role })
       .subscribe(
         (response: any) => {
           if (response.valid) {
+            window.alert('Signup successful!');  // Success popup
             this.router.navigate(['/login']);
+          } else {
+            window.alert('Signup failed!');  // Failure popup
           }
         },
         (error) => {
           console.log('An error occurred', error);
+          window.alert('An error occurred during signup.');  // Error popup
         }
       );
   }
+
 }
