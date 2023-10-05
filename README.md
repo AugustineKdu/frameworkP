@@ -12,7 +12,7 @@
 
 ---
 
-## Git Repository Organization
+## Git Repository Organization: https://github.com/AugustineKdu/frameworkP
 
 - **Frontend**: Contains all Angular client-side code.
 - **Backend**: Contains the Node.js server-side code.
@@ -38,7 +38,7 @@ Commits are made at the end of each completed feature or bug fix.
 
 ## Angular Architecture
 
-- **Components**: `ChatComponent`, `LoginComponent`, `AccountComponent`, `DashboardComponent`, `SuperAdminDashboardComponent`, `GroupAdminDashboardComponent`
+- **Components**: `ChatComponent`, `LoginComponent`, `AccountComponent`, `DashboardComponent`, `SuperAdminDashboardComponent`, `GroupAdminDashboardComponent`, `SignupComponent`, 
 - **Services**:  `ChatService` for chat functionalities.
 - **Models**: `User`, `ChatGroup`
 - **Routes**: Defined in `AppRoutingModule`, includes routes for login, account management, dashboards, and chat. The home screen uses the `DashboardComponent`, which varies based on the user's role (super-admin, group-admin, or user).
@@ -55,7 +55,7 @@ Commits are made at the end of each completed feature or bug fix.
 - `app.post('/api/auth')`: Handles user authentication by checking `username` and `password` against a predefined list of users. If authentication is successful, it returns user data; otherwise, it returns a 401 status.
 - `joinRoom`: Handles user joining a room.
 - `sendMessage`: Handles sending messages.
-
+ - 'signup': add the new user data on json and local file
 ### Files
 - `server.js`: The main server file containing all the setup, routing, and socket.io logic.
 
@@ -82,6 +82,10 @@ Commits are made at the end of each completed feature or bug fix.
 - **DELETE /api/chat-groups/:id**: Delete a chat group.
   - **Parameters**: `id`
   - **Returns**: Success or failure status.
+
+- **POST /api/signup:** Register a new user.
+  - **Parameters:** username, email, password, role
+  - **Returns:** The newly created user.
 
 ---
 

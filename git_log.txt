@@ -1,3 +1,24 @@
+https://github.com/AugustineKdu/frameworkP
+
+commit e9ec5071fdd4978deba5c90dad51f3d5242a56be (HEAD -> main, origin/main, origin/HEAD)
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 22:22:51 2023 +1000
+
+    update the super admin dashboard
+
+commit b124a4468a076a1aa573c6a6e1d669ddb726544f
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 21:36:39 2023 +1000
+
+    add the signup(with fix error during dev)and super add dashboard
+
+commit 356cab9250c5063a79be719553a700ebe19ea26e
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 11:38:14 2023 +1000
+
+    add the signup component and add the json file
+
+commit b7736ec95aead503d318851e4f7c19e69bee456b
 Author: Augustine <augustine.kim@griffithuni.edu.au>
 Date:   Thu Sep 7 05:47:46 2023 +1000
 
@@ -23,8 +44,46 @@ Date:   Thu Sep 7 05:27:50 2023 +1000
 
 commit 608ff6135c9afb5e1134a74bb34ea76f34390118
 Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 03:31:25 2023 +1000
+
+    add the access function on chat
+
+commit 748a9606feaeaaf65385024815333fc74986cb47
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 03:25:46 2023 +1000
+
+    change dashboard html and account detail view code
+
+commit 9bd05b5015d130c15bf07a920f4935b8d6b6ef5b
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 01:54:33 2023 +1000
+
+    change the css and html
+
+commit 8ea96504314bdce4020fc89b2c4cb15e808a9e64
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 00:12:33 2023 +1000
+
 :...skipping...
-commit b7736ec95aead503d318851e4f7c19e69bee456b (HEAD -> main, origin/main, origin/HEAD)
+commit e9ec5071fdd4978deba5c90dad51f3d5242a56be (HEAD -> main, origin/main, origin/HEAD)
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 22:22:51 2023 +1000
+
+    update the super admin dashboard
+
+commit b124a4468a076a1aa573c6a6e1d669ddb726544f
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 21:36:39 2023 +1000
+
+    add the signup(with fix error during dev)and super add dashboard
+
+commit 356cab9250c5063a79be719553a700ebe19ea26e
+Author: Augustine <augustine.kim@griffithuni.edu.au>
+Date:   Thu Sep 7 11:38:14 2023 +1000
+
+    add the signup component and add the json file
+
+commit b7736ec95aead503d318851e4f7c19e69bee456b
 Author: Augustine <augustine.kim@griffithuni.edu.au>
 Date:   Thu Sep 7 05:47:46 2023 +1000
 
@@ -79,35 +138,5 @@ Date:   Wed Sep 6 05:10:03 2023 +1000
     build chat component desgin
 
 commit f0126d21e6f0f7e26e955dfd551cd4627b52a7ec
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Wed Sep 6 04:42:50 2023 +1000
-
-    change the app.component html and css
-
-commit 94eaaedcf63741e16f8b8f423610a34761b54dd3
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Wed Sep 6 03:18:36 2023 +1000
-
-    add dashboard rout after login
-
-commit 6b6aff2e94a8eb55bc3c04c83383efec06244fcb
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Wed Sep 6 01:30:02 2023 +1000
-
-    fix the connect node server.js error
-
-commit 059262b16038a0f391bff70cb3fd885583f1508c
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Wed Sep 6 00:52:36 2023 +1000
-
-     connection error occur point
-
-commit 23852cb193dac196b17e743aa58e4d28fded3669
-Author: Augustine <augustine.kim@griffithuni.edu.au>
-Date:   Wed Sep 6 00:22:37 2023 +1000
-
-     connect node server.js with Angular
-
-commit 49f6878b0687ea01f9f3f3c854275d396101a926
 Author: Augustine <augustine.kim@griffithuni.edu.au>
 :
