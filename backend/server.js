@@ -1,3 +1,8 @@
+
+
+const uri = "mongodb://localhost:27017";
+const dbName = "mychatDB";  // 여기에 사용할 DB 이름 입력
+
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const http = require('http');
@@ -6,29 +11,45 @@ const socketIO = require('socket.io');
 const app = express();
 const port = 3000;
 
-// MongoDB URI
-const uri = "mongodb+srv://myUser:myPassword@cluster0.mongodb.net/myDatabase?retryWrites=true&w=majority";
 
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+app.use(express.json());
 
-let chatGroups = [];
-let users = [];
+const users = [
+    { username: "user1", password: "hashed_password1", email: "user1@example.com", isAdmin: false, isSuperAdmin: false },
+    { username: "admin1", password: "hashed_password2", email: "admin1@example.com", isAdmin: true, isSuperAdmin: false },
+    { username: "superadmin1", password: "hashed_password3", email: "superadmin1@example.com", isAdmin: true, isSuperAdmin: true },
+    { username: "user2", password: "hashed_password4", email: "user2@example.com", isAdmin: false, isSuperAdmin: false },
+    { username: "user3", password: "hashed_password5", email: "user3@example.com", isAdmin: false, isSuperAdmin: false },
+];
+
+const chatGroups = [
+    { name: "Group1", description: "Description for Group1", members: [] },
+    { name: "Group2", description: "Description for Group2", members: [] },
+    { name: "Group3", description: "Description for Group3", members: [] },
+];
+
+
+async function loadSampleData(db) {
+    try {
+        await db.collection('users').insertMany(users);
+        await db.collection('chatGroups').insertMany(chatGroups);
+        console.log("Sample data has been inserted into the database");
+    } catch (err) {
+        console.error("An error occurred while loading the sample data:", err);
+    }
+}
 
 async function startServer() {
     try {
-        // MongoDB 연결
-        await client.connect();
+        const client = await MongoClient.connect(uri);
         console.log("Connected to the database");
 
-        // 데이터베이스와 컬렉션 선택
-        const db = client.db('YOUR_DB_NAME');
-        const usersCollection = db.collection('users');
-        const chatGroupsCollection = db.collection('chatGroups');
+        const db = client.db(dbName);
 
-        // Express 서버 시작
+        // 샘플 데이터 로드
+        await loadSampleData(db);
+
         const server = http.Server(app);
-
-        // Socket.io for real-time chat
         const io = socketIO(server, {
             cors: {
                 origin: "http://localhost:4200",
@@ -36,187 +57,150 @@ async function startServer() {
             }
         });
 
-        // ... (나머지 기존 코드)
-
-        // API 엔드포인트 및 Socket.IO 이벤트 처리 로직
-        // (여기에 코드를 추가/수정하시면 됩니다.)
-        // ... (다른 코드)
-
-        // Authentication API
+        app.get('/', (req, res) => {
+            res.send('Server is running!');
+        });
+        // Authentication
         app.post('/api/auth', async (req, res) => {
             const { username, password } = req.body;
-            try {
-                const user = await usersCollection.findOne({ username, password });
-                if (user) {
-                    res.json({
-                        valid: true,
-                        username: user.username,
-                        email: user.email,
-                        role: user.role,
-                    });
-                } else {
-                    res.status(401).json({ valid: false });
-                }
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ valid: false });
+            const user = await usersCollection.findOne({ username, password });
+            if (user) {
+                res.json({ valid: true, userId: user._id });
+            } else {
+                res.status(401).json({ valid: false });
             }
         });
 
-        // Signup API
+        // Signup
         app.post('/api/signup', async (req, res) => {
-            const { username, email, password, role } = req.body;
+            const { username, email, password } = req.body;
             try {
-                const newUser = { username, email, password, role, valid: true };
+                const newUser = { username, email, password };
                 await usersCollection.insertOne(newUser);
-                res.json(newUser);
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Failed to signup' });
+                res.json({ success: true });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
             }
         });
 
-        // API to get all chat groups
+        // Retrieve chat groups
         app.get('/api/chat-groups', async (req, res) => {
             try {
-                const chatGroups = await chatGroupsCollection.find({}).toArray();
-                res.json(chatGroups);
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Failed to fetch chat groups' });
+                const groups = await chatGroupsCollection.find({}).toArray();
+                res.json(groups);
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ error: 'Failed to retrieve groups' });
             }
         });
 
-        // API to add a new chat group
+        // Create a chat group
         app.post('/api/chat-groups', async (req, res) => {
-            const newGroup = {
-                name: req.body.name,
-                messages: [],
-                usernames: req.body.usernames || []
-            };
-
+            const { name, users } = req.body;
             try {
+                const newGroup = { name, users, messages: [] };
                 const result = await chatGroupsCollection.insertOne(newGroup);
-                newGroup._id = result.insertedId;
-                res.json(newGroup);
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Failed to create chat group' });
+                res.json({ success: true, groupId: result.insertedId });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
             }
         });
-        // API to get all users with their chat groups
+
+        // Retrieve users
         app.get('/api/users', async (req, res) => {
             try {
                 const users = await usersCollection.find({}).toArray();
-                const usersWithGroups = await Promise.all(users.map(async user => {
-                    const groups = await chatGroupsCollection.find({ usernames: user.username }).toArray();
-                    return {
-                        ...user,
-                        groups: groups.map(group => ({ id: group._id, name: group.name }))
-                    };
-                }));
-                res.json(usersWithGroups);
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ error: 'Failed to fetch users' });
+                res.json(users);
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ error: 'Failed to retrieve users' });
             }
         });
 
-
-        // API to delete a chat group
+        // Delete a chat group
         app.delete('/api/chat-groups/:id', async (req, res) => {
             try {
-                const result = await chatGroupsCollection.deleteOne({ _id: new MongoClient.ObjectId(req.params.id) });
-                if (result.deletedCount === 1) {
-                    res.json({ success: true });
-                } else {
-                    res.status(404).json({ success: false, error: 'Group not found' });
-                }
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ success: false, error: 'Failed to delete chat group' });
+                const { id } = req.params;
+                await chatGroupsCollection.deleteOne({ _id: ObjectId(id) });
+                res.json({ success: true });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
             }
         });
 
-
-        // API to add a user to a chat group
+        // Add a user to a chat group
         app.put('/api/chat-groups/:id/add-user', async (req, res) => {
-            const { username } = req.body;
+            const { id } = req.params;
+            const { userId } = req.body;
             try {
-                const result = await chatGroupsCollection.updateOne(
-                    { _id: new MongoClient.ObjectId(req.params.id) },
-                    { $addToSet: { usernames: username } }
+                await chatGroupsCollection.updateOne(
+                    { _id: ObjectId(id) },
+                    { $addToSet: { users: ObjectId(userId) } }
                 );
-                if (result.matchedCount === 1) {
-                    res.json({ success: true });
-                } else {
-                    res.status(404).json({ success: false, error: 'Group not found' });
-                }
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ success: false, error: 'Failed to add user to chat group' });
+                res.json({ success: true });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
             }
         });
 
-        // API to remove a user from a chat group
+        // Remove a user from a chat group
         app.put('/api/chat-groups/:id/remove-user', async (req, res) => {
-            const { username } = req.body;
+            const { id } = req.params;
+            const { userId } = req.body;
             try {
-                const result = await chatGroupsCollection.updateOne(
-                    { _id: new MongoClient.ObjectId(req.params.id) },
-                    { $pull: { usernames: username } }
+                await chatGroupsCollection.updateOne(
+                    { _id: ObjectId(id) },
+                    { $pull: { users: ObjectId(userId) } }
                 );
-                if (result.matchedCount === 1) {
-                    res.json({ success: true });
-                } else {
-                    res.status(404).json({ success: false, error: 'Group not found' });
-                }
-            } catch (error) {
-                console.error(error);
-                res.status(500).json({ success: false, error: 'Failed to remove user from chat group' });
+                res.json({ success: true });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
             }
         });
 
-        // ... (다른 API 엔드포인트 및 Socket.IO 이벤트 핸들러)
-
-        io.on('connection', (socket) => {
-            console.log('New user connected');
-
-            socket.on('joinRoom', (roomId) => {
-                socket.join(roomId);
-            });
-
-            socket.on('leaveRoom', (roomId) => {
-                socket.leave(roomId);
-            });
-
-            socket.on('send message', async (data) => {
-                const { message, roomId } = data;
-                try {
-                    const group = await chatGroupsCollection.findOne({ _id: new MongoClient.ObjectId(roomId) });
-                    if (group) {
-                        await chatGroupsCollection.updateOne(
-                            { _id: new MongoClient.ObjectId(roomId) },
-                            { $push: { messages: { content: message } } }
-                        );
-                        io.to(roomId).emit('new message', { roomId, message });
-                    } else {
-                        socket.emit('error', 'Group not found');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    socket.emit('error', 'Failed to send message');
-                }
-            });
+        // Send a message to a chat group
+        app.post('/api/chat-groups/:id/send-message', async (req, res) => {
+            const { id } = req.params;
+            const { userId, text } = req.body;
+            try {
+                const newMessage = { userId: ObjectId(userId), text };
+                await chatGroupsCollection.updateOne(
+                    { _id: ObjectId(id) },
+                    { $push: { messages: newMessage } }
+                );
+                res.json({ success: true });
+            } catch (e) {
+                console.error(e);
+                res.status(500).json({ success: false });
+            }
         });
-
-
-
-
-
         server.listen(port, () => {
             console.log(`Server running on http://localhost:${port}`);
         });
+        io.on('connection', (socket) => {
+            console.log('a user connected');
+
+            socket.on('message', async ({ groupId, message }) => {
+                // Save message to database
+                await chatGroupsCollection.updateOne(
+                    { _id: ObjectId(groupId) },
+                    { $push: { messages: message } }
+                );
+
+                // Broadcast message to all connected sockets
+                io.emit('message', { groupId, message });
+            });
+
+            socket.on('disconnect', () => {
+                console.log('user disconnected');
+            });
+        });
+
     } catch (e) {
         console.error(e);
     }
