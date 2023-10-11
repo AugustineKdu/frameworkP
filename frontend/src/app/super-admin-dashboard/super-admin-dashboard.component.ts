@@ -8,10 +8,21 @@ interface User {
   role: string;
 }
 
+interface Message {
+  content: string;
+}
+
+interface Channel {
+  id: number;
+  name: string;
+  messages: Message[];
+  usernames: string[];
+}
+
 interface ChatGroup {
   id: number;
   name: string;
-  messages: { content: string }[];
+  channels: Channel[];
   usernames: string[];
 }
 
@@ -27,55 +38,52 @@ export class SuperAdminDashboardComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
-    // Fetch all users from the server
     this.http.get<User[]>('http://localhost:3000/api/users').subscribe(data => {
       this.users = data;
     });
 
-    // Fetch all chat groups from the server
     this.http.get<ChatGroup[]>('http://localhost:3000/api/chat-groups').subscribe(data => {
       this.chatGroups = data;
     });
   }
 
+  // Other existing methods ...
 
-  // Delete a user by their ID
-  deleteUser(userId: number) {
-    this.http.delete(`http://localhost:3000/api/users/${userId}`).subscribe(() => {
-      this.users = this.users.filter(user => user.id !== userId);
+  // Add a channel to a chat group
+  addChannelToChatGroup(groupId: number, channelName: string) {
+    this.http.post<Channel>(`http://localhost:3000/api/chat-groups/${groupId}/channels`, { name: channelName })
+      .subscribe(
+        (newChannel) => {
+          const group = this.chatGroups.find(g => g.id === groupId);
+          if (group) {
+            group.channels.push(newChannel);
+          }
+        },
+        (error) => {
+          console.log('An error occurred', error);
+        }
+      );
+  }
+
+  // Delete a channel from a chat group
+  deleteChannelFromChatGroup(groupId: number, channelId: number) {
+    this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}/channels/${channelId}`).subscribe(() => {
+      const group = this.chatGroups.find(g => g.id === groupId);
+      if (group) {
+        group.channels = group.channels.filter(channel => channel.id !== channelId);
+      }
     });
   }
 
-  changeUserRole(userId: number, newRole: string) {
-    this.http.put<{ role: string }>(`http://localhost:3000/api/users/${userId}`, { role: newRole })
+  // Add a message to a channel
+  addMessageToChannel(groupId: number, channelId: number, content: string) {
+    this.http.post<Message>(`http://localhost:3000/api/chat-groups/${groupId}/channels/${channelId}/messages`, { content })
       .subscribe(
-        (response) => {
-          const user = this.users.find(u => u.id === userId);
-          if (user) {
-            user.role = response.role;
-          }
-        },
-        (error) => {
-          console.log('An error occurred', error);
-        }
-      );
-  }
-
-  // Delete a chat group by its ID
-  deleteChatGroup(groupId: number) {
-    this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
-      this.chatGroups = this.chatGroups.filter(group => group.id !== groupId);
-    });
-  }
-
-  // Add a user to a chat group
-  addUserToChatGroup(groupId: number, username: string) {
-    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/add-user`, { username })
-      .subscribe(
-        (response) => {
+        (newMessage) => {
           const group = this.chatGroups.find(g => g.id === groupId);
-          if (group) {
-            group.usernames.push(username);
+          const channel = group?.channels.find(c => c.id === channelId);
+          if (channel) {
+            channel.messages.push(newMessage);
           }
         },
         (error) => {
@@ -83,24 +91,4 @@ export class SuperAdminDashboardComponent implements OnInit {
         }
       );
   }
-
-  // Remove a user from a chat group
-  removeUserFromChatGroup(groupId: number, username: string) {
-    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/remove-user`, { username })
-      .subscribe(
-        (response) => {
-          const group = this.chatGroups.find(g => g.id === groupId);
-          if (group) {
-            const index = group.usernames.indexOf(username);
-            if (index > -1) {
-              group.usernames.splice(index, 1);
-            }
-          }
-        },
-        (error) => {
-          console.log('An error occurred', error);
-        }
-      );
-  }
-
 }

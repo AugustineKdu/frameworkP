@@ -12,26 +12,36 @@ export class SignupComponent {
   email: string = '';
   password: string = '';
   role: string = 'user';
+  // API URL is directly defined in the component for this example
+  private apiUrl = 'http://localhost:3000';
 
+  // Injecting services into the component
   constructor(private http: HttpClient, private router: Router) { }
 
+  // Function handling the signup process
   signup() {
     console.log(this.role);
-    this.http.post('http://localhost:3000/api/signup', { username: this.username, email: this.email, password: this.password, role: this.role })
+    // Making a POST request to create a new user
+    this.http.post(`${this.apiUrl}/api/signup`, {
+      username: this.username,
+      email: this.email,
+      password: this.password,
+      role: this.role
+    })
       .subscribe(
         (response: any) => {
+          // Checking the response validity
           if (response.valid) {
-            window.alert('Signup successful!');  // Success popup
-            this.router.navigate(['/login']);
+            window.alert('Signup successful!');  // Alerting user about successful signup
+            this.router.navigate(['/login']);  // Redirecting to the login page
           } else {
-            window.alert('Signup failed!');  // Failure popup
+            window.alert('Signup failed!');  // Alerting user about signup failure
           }
         },
         (error) => {
-          console.log('An error occurred', error);
-          window.alert('An error occurred during signup.');  // Error popup
+          console.error('An error occurred', error);  // Logging the error
+          window.alert('An error occurred during signup.');  // Informing the user about an error
         }
       );
   }
-
 }
