@@ -1,24 +1,94 @@
 <div class="container">
-  <div class="sidebar-container">
-    <button class="add-group-button" (click)="addGroup()">Add Group</button>
-
-    <ul class="group-list">
-      <li class="group-list-item" *ngFor="let group of chatGroups">
-        <span class="group-name" (click)="selectGroup(group.id)">{{ group.name }}</span>
-        <button class="delete-button" (click)="deleteGroup(group.id)">Delete</button>
-      </li>
-    </ul>
-  </div>
-  <div class="chat-window-container">
-    <h2 class="chat-header" *ngIf="selectedGroup">{{ selectedGroup.name }}</h2>
-    <div class="messages-container">
-      <div class="message" *ngFor="let message of selectedGroup?.messages">
-        {{ message.content }}
+  <div class="chat-app">
+    <div class="sidebar">
+      <!-- Group List -->
+      <ul>
+        <li *ngFor="let group of chatGroups" (click)="selectGroup(group.id)">
+          {{ group.name }}
+        </li>
+      </ul>
+    </div>
+    <div class="chat-window" *ngIf="selectedGroup">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        {{ selectedGroup.name }}
       </div>
-    </div>
-    <div class="input-area-container">
-      <input class="message-input" [(ngModel)]="newMessage" placeholder="Type a message...">
-      <button class="send-button" (click)="sendMessage()">Send</button>
+
+      <!-- Message List -->
+      <div class="message-list">
+        <div class="message" *ngFor="let message of selectedGroup?.messages">
+          <img *ngIf="message.avatarUrl" [src]="message.avatarUrl" class="avatar">
+          <span class="sender">{{ message.sender }}</span>
+          <span class="timestamp">{{ message.timestamp | date: 'short' }}</span>
+          <p class="content">{{ message.content }}</p>
+          <img *ngIf="message.mediaUrl" [src]="message.mediaUrl" class="media">
+        </div>
+
+      </div>
+
+      <!-- Input Field -->
+      <!-- Input Field & File Upload -->
+      <div class="input-field">
+        <input [(ngModel)]="newMessage" placeholder="Type a message">
+        <input type="file" #fileInput (change)="onFileSelected($event)">
+        <button (click)="sendMessage()">Send</button>
+      </div>
+
     </div>
   </div>
+  <style>
+    .chat-app {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    .chat-window {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header,
+    .input-field {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .message-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      margin-right: 10px;
+    }
+
+    .message-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sender {
+      font-weight: bold;
+    }
+
+    .timestamp {
+      font-size: 0.8em;
+      color: #888;
+    }
+  </style>
 </div>

@@ -1,11 +1,15 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
+
 const socketIO = require('socket.io');
 const http = require('http');
 const cors = require('cors');
 
 const app = express();
 const port = 3000;
+
+const idToFind = 'yourIdHere';
+const query = { _id: new ObjectId(idToFind) };
 
 const fs = require('fs');
 app.use(cors({
@@ -377,10 +381,12 @@ async function startServer() {
         console.log('New user connected');
 
         socket.on('joinRoom', (roomId) => {
+            console.log(`User ${socket.id} is joining room ${roomId}`);
             socket.join(roomId);
         });
 
         socket.on('leaveRoom', (roomId) => {
+            console.log(`User ${socket.id} is leaving room ${roomId}`);
             socket.leave(roomId);
         });
 
