@@ -1,19 +1,31 @@
 <div class="account-container">
+  <!-- Header for the Account Page -->
   <h1>Accounts Page</h1>
+
+  <!-- Account Details Section: Displays when the user is logged in (i.e., currentUser is available) -->
   <div class="account-details" *ngIf="currentUser">
     <h2>Your Account Details:</h2>
+    <!-- List displaying the logged-in user's details -->
     <ul>
+      <!-- Display the username of the logged-in user -->
       <li><strong>Username:</strong> {{currentUser.username}}</li>
+      <!-- Display the email of the logged-in user -->
       <li><strong>Email:</strong> {{currentUser.email}}</li>
+      <!-- Display the role of the logged-in user -->
       <li><strong>Role:</strong> {{currentUser.role}}</li>
     </ul>
 
+    <!-- User Permissions Section: Lists the permissions of the user based on their role -->
     <ul>
       <p><strong>Your Permissions:</strong></p>
+      <!-- Iterate over each permission/role information and display it -->
       <li *ngFor="let role of userRoles">{{ role }}</li>
     </ul>
   </div>
+
+  <!-- Not Logged In Message: Displays when the user is not logged in (i.e., currentUser is null or undefined) -->
   <div class="not-logged-in" *ngIf="!currentUser">
+    <!-- Display a message and a link to navigate to the login page -->
     <p>You are not logged in. Please <a routerLink="/login">login</a> to view your account details.</p>
   </div>
 </div>

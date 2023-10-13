@@ -24,14 +24,18 @@ export class LoginComponent {
     this.http.post(apiUrl, { username: this.username, password: this.password })
       .subscribe(
         (response: any) => {
+          // Check if the response is valid
           if (response.valid) {
+            // Store user data in session storage and navigate to the dashboard
             sessionStorage.setItem('currentUser', JSON.stringify(response));
             this.router.navigate([this.getDashboardRoute(response.role)]);
           } else {
+            // Show an error message if authentication fails
             this.errorMessage = 'Invalid username or password';
           }
         },
         () => {
+          // Handle unexpected errors
           this.errorMessage = 'An error occurred';
         }
       );
@@ -51,6 +55,7 @@ export class LoginComponent {
 
   // Handle logout functionality
   logout() {
+    // Clear user data from session storage and navigate to the login page
     sessionStorage.clear();
     this.router.navigate(['/login']);
   }

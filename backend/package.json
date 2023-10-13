@@ -16,5 +16,13 @@
     "mongodb": "^6.1.0",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0"
+  },
+  "scripts": {
+    "test:unit": "mocha ./unitTest/*.test.js",
+    "test:integration": "mocha ./integrationTest/*.test.js",
+    "test": "npm run test:unit && npm run test:integration"
   }
 }

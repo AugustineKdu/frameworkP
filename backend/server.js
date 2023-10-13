@@ -8,11 +8,12 @@ const port = 3000;
 
 
 
-
 const uri = "mongodb://localhost:27017";
 const dbName = "mychatDB";
 
 app.use(express.json());
+
+
 
 async function loadSampleData(db) {
     try {
