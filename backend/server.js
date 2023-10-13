@@ -3,15 +3,27 @@ const { MongoClient } = require('mongodb');
 const socketIO = require('socket.io');
 const http = require('http');
 const cors = require('cors');
+
 const app = express();
 const port = 3000;
 
+const fs = require('fs');
 app.use(cors({
     origin: 'http://localhost:4200'
 }));
 
 const uri = "mongodb://localhost:27017";
 const dbName = "mychatDB";
+
+const fileUpload = require('express-fileupload');
+// video chat 
+const { PeerServer } = require('peer');
+
+const peerServer = PeerServer({
+    port: 9000,
+    path: '/myapp'
+});
+
 
 app.use(express.json());
 
@@ -22,9 +34,18 @@ const initialUsers = [
 ];
 
 const initialGroups = [
-    { name: 'General', messages: [], usernames: ['user', 'group', 'super'] },
-    { name: 'Random', messages: [], usernames: ['user', 'group', 'super'] }
+    {
+        name: 'General',
+        messages: [
+            { sender: 'user1', content: 'Hello everyone!', timestamp: new Date() },
+            { sender: 'user2', content: 'Hi!', timestamp: new Date() },
+            // ... more messages
+        ],
+        usernames: ['user1', 'user2', 'user3']
+    },
+    // ... more groups
 ];
+
 
 
 async function initializeDatabase() {
@@ -33,22 +54,28 @@ async function initializeDatabase() {
     try {
         const db = client.db(dbName);
 
+        // Check if 'users' and 'groups' collections are empty
+        const usersCount = await db.collection('users').countDocuments({});
+        const groupsCount = await db.collection('groups').countDocuments({});
 
-        await db.collection('users').deleteMany({});
-        await db.collection('groups').deleteMany({});
+        // If they are empty, insert the initial users and groups
+        if (usersCount === 0) {
+            await db.collection('users').insertMany(initialUsers);
+        }
 
+        if (groupsCount === 0) {
+            await db.collection('groups').insertMany(initialGroups);
+        }
 
-        await db.collection('users').insertMany(initialUsers);
-        await db.collection('groups').insertMany(initialGroups);
-
-        console.log("Database has been initialized");
+        console.log("Database has been checked and initialized if needed");
     } catch (err) {
-        console.error("An error occurred while initializing the database:", err);
+        console.error("An error occurred while checking or initializing the database:", err);
     } finally {
-
         await client.close();
     }
 }
+
+
 
 initializeDatabase();
 async function loadSampleData(db) {
@@ -310,6 +337,42 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+    app.use(fileUpload());
+
+    app.post('/upload-avatar', (req, res) => {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).send('No files were uploaded.');
+        }
+
+        // The name of the input field is used to retrieve the uploaded file
+        let avatar = req.files.avatar;
+        let uploadPath = __dirname + '/uploads/avatars/' + avatar.name;
+
+        // Use mv() to place the file on the server
+        avatar.mv(uploadPath, function (err) {
+            if (err)
+                return res.status(500).send(err);
+
+            res.send('File uploaded!');
+        });
+    });
+
+    app.post('/upload', (req, res) => {
+        let uploadedFile = req.files.file; // access uploaded file
+        let filename = `${__dirname}/uploads/${uploadedFile.name}`;
+
+        // Use the mv() method to place the file on your server
+        uploadedFile.mv(filename, (err) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
+
+            // Save filepath to MongoDB (for example)
+
+
+            res.send('File uploaded!');
+        });
+    });
     io.on('connection', (socket) => {
         console.log('New user connected');
 
@@ -332,7 +395,7 @@ async function startServer() {
                     // Push the new message into the messages array in the MongoDB collection
                     await db.collection('groups').updateOne(
                         { _id: new MongoClient.ObjectId(roomId) },
-                        { $push: { messages: { content: message } } }
+                        { $push: { messages: { sender: message.sender, content: message.content, timestamp: new Date() } } }
                     );
 
                     // Emit the message to all clients in the room
@@ -346,6 +409,7 @@ async function startServer() {
                 socket.emit('error', 'Internal Server Error');
             }
         });
+
 
         socket.on('disconnect', () => {
             console.log('user disconnected');
