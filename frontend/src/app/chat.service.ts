@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -5,24 +6,22 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class ChatService {
-  private apiBaseUrl = 'http://localhost:3000/api'; // Define the base API URL
-
   constructor(private http: HttpClient) { }
 
   createGroupChannel(channelName: string, userIds: string[]) {
-    return this.http.post(`${this.apiBaseUrl}/createGroupChannel`, { channelName, userIds });
+    return this.http.post('/api/createGroupChannel', { channelName, userIds });
   }
 
   getMyGroupChannels() {
-    return this.http.get(`${this.apiBaseUrl}/getMyGroupChannels`);
+    return this.http.get('/api/getMyGroupChannels');
   }
 
-  // Save channel information to local storage
+  // 로컬 저장소에 채널 정보 저장
   saveChannelsToLocalStorage(channels: any[]) {
     localStorage.setItem('channels', JSON.stringify(channels));
   }
 
-  // Load channel information from local storage
+  // 로컬 저장소에서 채널 정보 불러오기
   loadChannelsFromLocalStorage(): any[] {
     const channels = localStorage.getItem('channels');
     return channels ? JSON.parse(channels) : [];

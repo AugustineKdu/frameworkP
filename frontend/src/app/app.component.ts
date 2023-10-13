@@ -7,6 +7,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  title(title: any) {
+    throw new Error('Method not implemented.');
+  }
   isLoggedIn = false;
 
   constructor(private router: Router) { }
@@ -15,38 +18,26 @@ export class AppComponent implements OnInit {
     this.checkLoginStatus();
   }
 
-  // Check if the user is logged in and navigate to the respective dashboard
   checkLoginStatus() {
     const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-    this.isLoggedIn = Boolean(user && user.role);  // Ensuring both user and role exist
+    this.isLoggedIn = !!user;
 
     if (this.isLoggedIn) {
-      this.navigateToDashboard(user.role);
+
+      const role = user.role;
+      if (role === 'super-admin') {
+        this.router.navigate(['/super-admin-dashboard']);
+      } else if (role === 'group-admin') {
+        this.router.navigate(['/group-admin-dashboard']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     }
   }
 
-  // Logout function to clear session and navigate to login
   logout() {
     sessionStorage.clear();
     this.isLoggedIn = false;
     this.router.navigate(['/login']);
-  }
-
-  // Helper function to navigate to the respective dashboard based on user role
-  private navigateToDashboard(role: string) {
-    let dashboardRoute = '';
-
-    switch (role) {
-      case 'super-admin':
-        dashboardRoute = '/super-admin-dashboard';
-        break;
-      case 'group-admin':
-        dashboardRoute = '/group-admin-dashboard';
-        break;
-      default:
-        dashboardRoute = '/dashboard';
-    }
-
-    this.router.navigate([dashboardRoute]);
   }
 }

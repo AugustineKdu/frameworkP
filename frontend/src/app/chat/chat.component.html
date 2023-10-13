@@ -1,39 +1,23 @@
 <div class="container">
-  <!-- Sidebar Section: Contains buttons to add a new group and a list of chat groups -->
   <div class="sidebar-container">
-    <!-- Button to add a new chat group -->
     <button class="add-group-button" (click)="addGroup()">Add Group</button>
 
-    <!-- List of chat groups -->
     <ul class="group-list">
-      <!-- Iterate over each chat group and display its name. Also, provide options to select and delete the group -->
       <li class="group-list-item" *ngFor="let group of chatGroups">
-        <!-- Clicking on the group name selects it and displays its messages in the chat window -->
         <span class="group-name" (click)="selectGroup(group.id)">{{ group.name }}</span>
-        <!-- Button to delete the respective chat group -->
         <button class="delete-button" (click)="deleteGroup(group.id)">Delete</button>
       </li>
     </ul>
   </div>
-
-  <!-- Chat Window Section: Displays messages of the selected group and input area to send new messages -->
   <div class="chat-window-container">
-    <!-- Display the name of the selected chat group as the header -->
     <h2 class="chat-header" *ngIf="selectedGroup">{{ selectedGroup.name }}</h2>
-
-    <!-- Container to display messages of the selected group -->
     <div class="messages-container">
-      <!-- Iterate over each message of the selected group and display its content -->
       <div class="message" *ngFor="let message of selectedGroup?.messages">
         {{ message.content }}
       </div>
     </div>
-
-    <!-- Input Area: Contains text input for new message and a button to send it -->
     <div class="input-area-container">
-      <!-- Text input to type the new message -->
       <input class="message-input" [(ngModel)]="newMessage" placeholder="Type a message...">
-      <!-- Button to send the new message -->
       <button class="send-button" (click)="sendMessage()">Send</button>
     </div>
   </div>
