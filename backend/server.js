@@ -2,9 +2,13 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const socketIO = require('socket.io');
 const http = require('http');
-
+const cors = require('cors');
 const app = express();
 const port = 3000;
+
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 
 const uri = "mongodb://localhost:27017";
 const dbName = "mychatDB";
@@ -23,6 +27,30 @@ const initialGroups = [
 ];
 
 
+async function initializeDatabase() {
+    const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+    try {
+        const db = client.db(dbName);
+
+
+        await db.collection('users').deleteMany({});
+        await db.collection('groups').deleteMany({});
+
+
+        await db.collection('users').insertMany(initialUsers);
+        await db.collection('groups').insertMany(initialGroups);
+
+        console.log("Database has been initialized");
+    } catch (err) {
+        console.error("An error occurred while initializing the database:", err);
+    } finally {
+
+        await client.close();
+    }
+}
+
+initializeDatabase();
 async function loadSampleData(db) {
     try {
         await db.collection('users').insertMany(initialUsers);
