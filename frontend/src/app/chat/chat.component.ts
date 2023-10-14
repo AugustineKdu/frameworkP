@@ -2,21 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 
-interface ChatMessage {
-  sender: string;
-  content: string;
-  timestamp: string;  // Using string to store the ISO string of the date
-  avatarUrl: string;
-  mediaUrl?: string | null;
-}
-
-
+// Define the structure of a chat group
 interface ChatGroup {
-  id: number;
+  id: string;
   name: string;
-  messages: ChatMessage[];
+  messages: { content: string }[];
 }
-
 
 @Component({
   selector: 'app-chat',
@@ -26,48 +17,57 @@ interface ChatGroup {
 export class ChatComponent implements OnInit {
   socket: Socket;
   newMessage = '';
-  selectedFile: File | null = null;
-  selectedMediaUrl?: string | null = null;
   chatGroups: ChatGroup[] = [];
   selectedGroup: ChatGroup | null = null;
-  currentUser: any = null;
+  currentUser: any = null; // To store the current user's information
 
   constructor(private http: HttpClient) {
+    // Initialize Socket.io
     this.socket = io('http://localhost:3000');
-    this.socket.on('new message', (data: { roomId: number; message: ChatMessage }) => {
-      if (this.selectedGroup?.id === data.roomId) {
-        this.selectedGroup.messages.push(data.message);
-        this.saveToLocalStorage();
+
+    // Listen for new messages and update the UI
+    this.socket.on('new message', (data: { _id: string; message: string }) => {
+      if (this.selectedGroup?.id === data._id) {
+        this.selectedGroup.messages.push({ content: data.message });
+        this.saveToLocalStorage(); // Save updated messages to local storage
       }
     });
   }
 
   ngOnInit(): void {
+    // Load chat groups from local storage first
     this.chatGroups = this.loadFromLocalStorage();
+
+    // Then update from the server
     this.http.get<ChatGroup[]>('http://localhost:3000/api/chat-groups').subscribe((groups) => {
       this.chatGroups = groups;
-      this.saveToLocalStorage();
+      this.saveToLocalStorage(); // Save to local storage
     });
+
+    // Load the current user from session storage
     const user = sessionStorage.getItem('currentUser');
     if (user) {
       this.currentUser = JSON.parse(user);
     }
   }
 
-  selectGroup(groupId: number): void {
-    this.selectedGroup = this.chatGroups.find((group) => group.id === groupId) || null;
+  // Function to select a chat group
+  selectGroup(_id: string): void {
+    this.selectedGroup = this.chatGroups.find((group) => group.id === _id) || null;
     if (this.selectedGroup) {
-      this.socket.emit('joinRoom', groupId);
+      this.socket.emit('joinRoom', _id); // Join the selected chat room
     }
   }
 
-  addGroup(): void {
-    if (this.currentUser && ['group-admin', 'super-admin'].includes(this.currentUser.role)) {
+  // Function to add a new chat group
+  addGroup() {
+    // Check if the user has the permission to add a group
+    if (this.currentUser && (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin')) {
       const groupName = prompt('Enter new group name:');
       if (groupName) {
         this.http.post<ChatGroup>('http://localhost:3000/api/chat-groups', { name: groupName }).subscribe((newGroup) => {
           this.chatGroups.push(newGroup);
-          this.saveToLocalStorage();
+          this.saveToLocalStorage(); // Save to local storage
         });
       }
     } else {
@@ -75,13 +75,15 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  deleteGroup(groupId: number): void {
-    if (this.currentUser && ['group-admin', 'super-admin'].includes(this.currentUser.role)) {
+  // Function to delete a chat group
+  deleteGroup(groupId: string) {
+    // Check if the user has the permission to delete a group
+    if (this.currentUser && (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin')) {
       this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
         const index = this.chatGroups.findIndex(group => group.id === groupId);
         if (index !== -1) {
           this.chatGroups.splice(index, 1);
-          this.saveToLocalStorage();
+          this.saveToLocalStorage(); // Save to local storage
         }
       });
     } else {
@@ -89,49 +91,23 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-  }
-
+  // Function to send a message
   sendMessage(): void {
+    // Check if the user is logged in
     if (this.currentUser && this.selectedGroup) {
-      const message: ChatMessage = {
-        sender: this.currentUser.username,
-        content: this.newMessage,
-        timestamp: new Date().toISOString(),
-        avatarUrl: this.currentUser.avatarUrl,
-        mediaUrl: this.selectedMediaUrl || null  // Handle undefined
-      };
-      this.socket.emit('send message', { message, roomId: this.selectedGroup.id });
-      this.newMessage = '';
-      this.selectedMediaUrl = null;
+      this.socket.emit('send message', { message: this.newMessage, _id: this.selectedGroup.id });
+      this.newMessage = ''; // Clear the input field
     } else {
       alert('You must be logged in to send a message.');
     }
   }
 
-
-  actualSendMessage(fileUrl: string | null): void {
-    if (this.currentUser && this.selectedGroup) {
-      const message: ChatMessage = {
-        content: this.newMessage,
-        sender: this.currentUser.username,
-        timestamp: new Date().toISOString(),
-        avatarUrl: this.currentUser.avatarUrl,
-        mediaUrl: fileUrl
-      };
-      this.socket.emit('send message', { message, roomId: this.selectedGroup.id });
-      this.newMessage = '';
-      this.selectedFile = null;
-    } else {
-      alert('You must be logged in to send a message.');
-    }
-  }
-
+  // Function to save chat groups to local storage
   saveToLocalStorage(): void {
     localStorage.setItem('chatGroups', JSON.stringify(this.chatGroups));
   }
 
+  // Function to load chat groups from local storage
   loadFromLocalStorage(): ChatGroup[] {
     const storedGroups = localStorage.getItem('chatGroups');
     return storedGroups ? JSON.parse(storedGroups) : [];
