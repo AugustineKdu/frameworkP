@@ -4,7 +4,7 @@ import { io, Socket } from 'socket.io-client';
 
 // Define the structure of a chat group
 interface ChatGroup {
-  id: string;
+  id: number;
   name: string;
   messages: { content: string }[];
 }
@@ -26,7 +26,7 @@ export class ChatComponent implements OnInit {
     this.socket = io('http://localhost:3000');
 
     // Listen for new messages and update the UI
-    this.socket.on('new message', (data: { _id: string; message: string }) => {
+    this.socket.on('new message', (data: { _id: number; message: string }) => {
       if (this.selectedGroup?.id === data._id) {
         this.selectedGroup.messages.push({ content: data.message });
         this.saveToLocalStorage(); // Save updated messages to local storage
@@ -52,7 +52,7 @@ export class ChatComponent implements OnInit {
   }
 
   // Function to select a chat group
-  selectGroup(_id: string): void {
+  selectGroup(_id: number): void {
     this.selectedGroup = this.chatGroups.find((group) => group.id === _id) || null;
     if (this.selectedGroup) {
       this.socket.emit('joinRoom', _id); // Join the selected chat room
@@ -76,7 +76,7 @@ export class ChatComponent implements OnInit {
   }
 
   // Function to delete a chat group
-  deleteGroup(groupId: string) {
+  deleteGroup(groupId: number) {
     // Check if the user has the permission to delete a group
     if (this.currentUser && (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin')) {
       this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {

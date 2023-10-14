@@ -13,7 +13,7 @@
     <h2 class="chat-header" *ngIf="selectedGroup">{{ selectedGroup.name }}</h2>
     <div class="messages-container">
       <div class="message" *ngFor="let message of selectedGroup?.messages">
-        {{ message.content }}
+        {{message}}{{ message.content }}
       </div>
     </div>
     <div class="input-area-container">
