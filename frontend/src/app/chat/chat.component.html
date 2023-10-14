@@ -4,8 +4,8 @@
 
     <ul class="group-list">
       <li class="group-list-item" *ngFor="let group of chatGroups">
-        <span class="group-name" (click)="selectGroup(group.id)">{{ group.name }}</span>
-        <button class="delete-button" (click)="deleteGroup(group.id)">Delete</button>
+        <span class="group-name" (click)="selectGroup(group._id)">{{ group.name }}</span>
+        <button class="delete-button" (click)="deleteGroup(group._id)">Delete</button>
       </li>
     </ul>
   </div>
@@ -13,7 +13,7 @@
     <h2 class="chat-header" *ngIf="selectedGroup">{{ selectedGroup.name }}</h2>
     <div class="messages-container">
       <div class="message" *ngFor="let message of selectedGroup?.messages">
-        {{message}}{{ message.content }}
+        {{ message.content }}
       </div>
     </div>
     <div class="input-area-container">

@@ -2,9 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 
-// Define the structure of a chat group
 interface ChatGroup {
-  id: number;
+  _id: string;
   name: string;
   messages: { content: string }[];
 }
@@ -22,32 +21,29 @@ export class ChatComponent implements OnInit {
   currentUser: any = null;
 
   constructor(private http: HttpClient) {
-    // Initialize Socket.io
     this.socket = io('http://localhost:3000');
 
-    // Listen for new messages and update the UI
-    this.socket.on('new message', (data: { _id: number; message: string }) => {
-      if (this.selectedGroup?.id === data._id) {
-        this.selectedGroup.messages.push({ content: data.message });
+    this.socket.on('new message', (data: { roomId: string; message: string }) => {
+      const group = this.chatGroups.find(g => g._id === data.roomId);
+      if (group) {
+        group.messages.push({ content: data.message });
       }
     });
   }
 
   ngOnInit(): void {
-    // Update chat groups from the server
     this.http.get<ChatGroup[]>('http://localhost:3000/api/chat-groups').subscribe((groups) => {
       this.chatGroups = groups;
     });
 
-    // Load the current user from session storage
     const user = sessionStorage.getItem('currentUser');
     if (user) {
       this.currentUser = JSON.parse(user);
     }
   }
 
-  selectGroup(_id: number): void {
-    this.selectedGroup = this.chatGroups.find((group) => group.id === _id) || null;
+  selectGroup(_id: string): void {
+    this.selectedGroup = this.chatGroups.find((group) => group._id === _id) || null;
     if (this.selectedGroup) {
       this.socket.emit('joinRoom', _id);
     }
@@ -66,10 +62,10 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  deleteGroup(groupId: number) {
+  deleteGroup(groupId: string) {
     if (this.currentUser && (this.currentUser.role === 'group-admin' || this.currentUser.role === 'super-admin')) {
       this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
-        const index = this.chatGroups.findIndex(group => group.id === groupId);
+        const index = this.chatGroups.findIndex(group => group._id === groupId);
         if (index !== -1) {
           this.chatGroups.splice(index, 1);
         }
@@ -81,7 +77,7 @@ export class ChatComponent implements OnInit {
 
   sendMessage(): void {
     if (this.currentUser && this.selectedGroup) {
-      this.socket.emit('send message', { message: this.newMessage, _id: this.selectedGroup.id });
+      this.socket.emit('send message', { message: this.newMessage, roomId: this.selectedGroup._id });
       this.newMessage = '';
     } else {
       alert('You must be logged in to send a message.');

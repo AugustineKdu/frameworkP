@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 const socketIO = require('socket.io');
 const http = require('http');
@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const app = express();
 const port = 3000;
+
 
 
 const fs = require('fs');
@@ -380,12 +381,13 @@ async function startServer() {
             socket.leave(roomId);
         });
 
+
         socket.on('send message', async (data) => {
             const { message, roomId } = data;
             try {
                 // Add the message to the database
                 const result = await db.collection('chatGroups').updateOne(
-                    { _id: new MongoClient.ObjectId(roomId) },
+                    { _id: roomId },
                     { $push: { messages: message } }
                 );
                 // Emit the message to other users in the room
@@ -397,9 +399,12 @@ async function startServer() {
         });
 
 
+
+
         socket.on('disconnect', () => {
             console.log(`User disconnected`);
         });
     });
+
 }
 startServer();
