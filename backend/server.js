@@ -29,9 +29,9 @@ const peerServer = PeerServer({
 
 app.use(express.json());
 const initialUsers = [
-    { username: 'user', email: 'user@example.com', password: '123', role: 'user', valid: true },
-    { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true },
-    { username: 'super', email: 'superadmin@example.com', password: '123', role: 'super-admin', valid: true },
+    { username: 'user', email: 'user@example.com', password: '123', role: 'user', valid: true, avatar: 'path_to_avatar_image', },
+    { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true, avatar: 'path_to_avatar_image', },
+    { username: 'super', email: 'superadmin@example.com', password: '123', role: 'super-admin', valid: true, avatar: 'path_to_avatar_image', },
 ];
 const initialChatGroups = [
     {
@@ -184,13 +184,114 @@ async function startServer() {
     });
     const INTERNAL_SERVER_ERROR_MSG = 'Internal Server Error';
     //User APIs
-    app.put('/api/users/:id/role', async (req, res) => {
-        const { id } = req.params;
+    // app.put('/api/users/:id/role', async (req, res) => {
+    //     const { id } = req.params;
+    //     const { newRole } = req.body;
+
+    //     try {
+    //         const result = await db.collection('users').updateOne(
+    //             { _id: new MongoClient.ObjectId(id) },
+    //             { $set: { role: newRole } }
+    //         );
+
+    //         if (result.modifiedCount === 1) {
+    //             res.json({ success: true });
+    //         } else {
+    //             res.status(404).json({ success: false });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //     }
+    // });
+    // app.delete('/api/users/:id', async (req, res) => {
+    //     const { id } = req.params;
+
+    //     try {
+    //         const result = await db.collection('users').deleteOne({ _id: new MongoClient.ObjectId(id) });
+
+    //         if (result.deletedCount === 1) {
+    //             res.json({ success: true });
+    //         } else {
+    //             res.status(404).json({ success: false });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //     }
+    // });
+    // app.delete('/api/users/:id', async (req, res) => {
+    //     const { id } = req.params;
+
+    //     try {
+    //         const result = await db.collection('users').deleteOne({ _id: new MongoClient.ObjectId(id) });
+
+    //         if (result.deletedCount === 1) {
+    //             res.json({ success: true });
+    //         } else {
+    //             res.status(404).json({ success: false });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //     }
+    // });
+    // app.put('/api/users/:id', async (req, res) => {
+    //     const { id } = req.params;
+    //     const { role } = req.body;
+
+    //     try {
+    //         const result = await db.collection('users').updateOne(
+    //             { _id: new MongoClient.ObjectId(id) },
+    //             { $set: { role } }
+    //         );
+
+    //         if (result.modifiedCount === 1) {
+    //             res.json({ success: true, role });
+    //         } else {
+    //             res.status(404).json({ success: false });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //     }
+    // });
+    // app.get('/api/users', async (req, res) => {
+    //     try {
+    //         const users = await db.collection('users').find().toArray();
+    //         const groups = await db.collection('groups').find().toArray();
+
+    //         // 로깅을 추가하여 어떤 그룹이 usernames 속성을 가지고 있지 않은지 확인
+    //         groups.forEach((group, index) => {
+    //             if (!group.usernames) {
+    //                 console.error(`Group at index ${index} does not have a usernames property`, group);
+    //             }
+    //         });
+
+    //         const usersWithGroups = users.map(user => {
+    //             // Safe navigation to avoid error if usernames is not defined
+    //             const userGroups = groups.filter(group => group.usernames?.includes(user.username));
+    //             return {
+    //                 ...user,
+    //                 groups: userGroups.map(group => ({ _id: group._id, name: group.name }))
+    //             };
+    //         });
+
+    //         res.json(usersWithGroups);
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ error: 'Internal Server Error' });
+    //     }
+    // });
+
+    // Update user role by username
+    app.put('/api/users/:username/role', async (req, res) => {
+        const { username } = req.params;
         const { newRole } = req.body;
 
         try {
             const result = await db.collection('users').updateOne(
-                { _id: new MongoClient.ObjectId(id) },
+                { username: username },
                 { $set: { role: newRole } }
             );
 
@@ -204,11 +305,13 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-    app.delete('/api/users/:id', async (req, res) => {
-        const { id } = req.params;
+
+    // Delete user by username
+    app.delete('/api/users/:username', async (req, res) => {
+        const { username } = req.params;
 
         try {
-            const result = await db.collection('users').deleteOne({ _id: new MongoClient.ObjectId(id) });
+            const result = await db.collection('users').deleteOne({ username: username });
 
             if (result.deletedCount === 1) {
                 res.json({ success: true });
@@ -220,29 +323,15 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-    app.delete('/api/users/:id', async (req, res) => {
-        const { id } = req.params;
 
-        try {
-            const result = await db.collection('users').deleteOne({ _id: new MongoClient.ObjectId(id) });
-
-            if (result.deletedCount === 1) {
-                res.json({ success: true });
-            } else {
-                res.status(404).json({ success: false });
-            }
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Internal Server Error' });
-        }
-    });
-    app.put('/api/users/:id', async (req, res) => {
-        const { id } = req.params;
+    // Update user details by username
+    app.put('/api/users/:username', async (req, res) => {
+        const { username } = req.params;
         const { role } = req.body;
 
         try {
             const result = await db.collection('users').updateOne(
-                { _id: new MongoClient.ObjectId(id) },
+                { username: username },
                 { $set: { role } }
             );
 
@@ -256,12 +345,14 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+
+    // Fetch users and their groups
     app.get('/api/users', async (req, res) => {
         try {
             const users = await db.collection('users').find().toArray();
-            const groups = await db.collection('groups').find().toArray();
+            const groups = await db.collection('chatGroups').find().toArray();
 
-            // 로깅을 추가하여 어떤 그룹이 usernames 속성을 가지고 있지 않은지 확인
+            // Logging to check which group does not have a usernames property
             groups.forEach((group, index) => {
                 if (!group.usernames) {
                     console.error(`Group at index ${index} does not have a usernames property`, group);
@@ -283,6 +374,49 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+    app.put('/api/chat-groups/:groupId/add-user', async (req, res) => {
+        const groupId = req.params.groupId;
+        const { username } = req.body;
+
+        try {
+            const result = await db.collection('chatGroups').updateOne(
+                { _id: new ObjectId(groupId) },
+                { $addToSet: { usernames: username } }
+            );
+
+            if (result.modifiedCount === 1) {
+                res.json({ success: true });
+            } else {
+                res.status(404).json({ success: false, message: 'Group not found' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+    app.put('/api/chat-groups/:groupId/remove-user', async (req, res) => {
+        const groupId = req.params.groupId;
+        const { username } = req.body;
+
+        try {
+            const result = await db.collection('chatGroups').updateOne(
+                { _id: new ObjectId(groupId) },
+                { $pull: { usernames: username } }
+            );
+
+            if (result.modifiedCount === 1) {
+                res.json({ success: true });
+            } else {
+                res.status(404).json({ success: false, message: 'Group not found' });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+
+
     //image control APIs
     app.post('/upload-avatar', (req, res) => {
         if (!req.files || Object.keys(req.files).length === 0) {
@@ -318,8 +452,6 @@ async function startServer() {
         });
     });
     //ChatGroup APIs
-
-    // API to get all chat groups
     app.get('/api/chat-groups', async (req, res) => {
         try {
             const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -331,8 +463,6 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
-
-    // API to add a new chat group
     app.post('/api/chat-groups', async (req, res) => {
         const newGroup = {
             name: req.body.name,
@@ -340,23 +470,22 @@ async function startServer() {
             usernames: req.body.usernames || []
         };
         try {
-            const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+            const client = await MongoClient.connect(uri);
             const db = client.db(dbName);
             const result = await db.collection('chatGroups').insertOne(newGroup);
-            res.json(result.ops[0]);  // Return the new chat group
+            res.json(result.ops[0]);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
 
-    // API to delete a chat group
     app.delete('/api/chat-groups/:id', async (req, res) => {
         const _id = req.params.id;
         try {
-            const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+            const client = await MongoClient.connect(uri);
             const db = client.db(dbName);
-            const result = await db.collection('chatGroups').deleteOne({ _id: new MongoClient.ObjectId(_id) });
+            const result = await db.collection('chatGroups').deleteOne({ _id });
             if (result.deletedCount === 1) {
                 res.json({ success: true });
             } else {
@@ -367,6 +496,36 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+    app.post('/api/upload-avatar', async (req, res) => {
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).send('No files were uploaded.');
+        }
+
+        // The name of the input field (i.e. "avatar") is used to retrieve the uploaded file
+        let avatar = req.files.avatar;
+        let uploadPath = __dirname + '/uploads/avatars/' + avatar.name;
+
+        // Use mv() to place the file on the server
+        avatar.mv(uploadPath, async function (err) {
+            if (err)
+                return res.status(500).send(err);
+
+            // Update the user's avatar path in the database
+            try {
+                const { username } = req.body; // assuming you send username along with file
+                await db.collection('users').updateOne(
+                    { username },
+                    { $set: { avatar: '/uploads/avatars/' + avatar.name } }
+                );
+            } catch (error) {
+                console.error(error);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            res.send('File uploaded!');
+        });
+    });
+
 
 
 
@@ -381,26 +540,41 @@ async function startServer() {
             socket.leave(roomId);
         });
 
-
         socket.on('send message', async (data) => {
             const { message, roomId } = data;
+
             try {
+                // Validate the message
+                if (!message || !message.content || !message.sender || !message.timestamp) {
+                    socket.emit('error', 'Invalid message format');
+                    return;
+                }
+
+                // If there's media (image/video), validate its URL
+                if (message.fileUrl && !isValidUrl(message.fileUrl)) {
+                    socket.emit('error', 'Invalid file URL');
+                    return;
+                }
+
                 // Add the message to the database
                 const result = await db.collection('chatGroups').updateOne(
                     { _id: roomId },
                     { $push: { messages: message } }
                 );
-                // Emit the message to other users in the room
+
+                // Validate the operation result
+                if (result.modifiedCount !== 1) {
+                    socket.emit('error', 'Message could not be sent');
+                    return;
+                }
+
+                // Broadcast the message
                 io.to(roomId).emit('new message', { roomId, message });
             } catch (error) {
                 console.error(error);
                 socket.emit('error', 'Internal Server Error');
             }
         });
-
-
-
-
         socket.on('disconnect', () => {
             console.log(`User disconnected`);
         });

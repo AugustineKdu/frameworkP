@@ -1,3 +1,17 @@
+# Phase 2 Updates
+- **Data Storage**:  Replaced local JSON file storage with MongoDB for better scalability and data integrity.
+- **Media Support**: Added support for storing and serving images and videos within chat messages.
+- **Unit Testing**: Implemented unit tests for critical server-side functions to ensure code reliability and correctness.
+
+# Data Persistence
+The server uses MongoDB to persistently store user and chat group data.
+Data is loaded from the MongoDB database when the server starts and saved back to the database whenever there are changes to the user or chat group data.
+
+
+
+
+
+
 # frameworkP
 # Chat Application Documentation
 

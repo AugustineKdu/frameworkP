@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 interface User {
-  id: number;
   username: string;
   email: string;
   role: string;
 }
 
 interface ChatGroup {
-  id: number;
+  _id: string;
   name: string;
   messages: { content: string }[];
   usernames: string[];
@@ -26,6 +25,7 @@ export class SuperAdminDashboardComponent implements OnInit {
 
   constructor(private http: HttpClient) { }
 
+
   ngOnInit(): void {
     // Fetch all users from the server
     this.http.get<User[]>('http://localhost:3000/api/users').subscribe(data => {
@@ -38,19 +38,19 @@ export class SuperAdminDashboardComponent implements OnInit {
     });
   }
 
-
-  // Delete a user by their ID
-  deleteUser(userId: number) {
-    this.http.delete(`http://localhost:3000/api/users/${userId}`).subscribe(() => {
-      this.users = this.users.filter(user => user.id !== userId);
+  // Delete a user by their username
+  deleteUser(username: string) {
+    this.http.delete(`http://localhost:3000/api/users/${username}`).subscribe(() => {
+      this.users = this.users.filter(user => user.username !== username);
     });
   }
 
-  changeUserRole(userId: number, newRole: string) {
-    this.http.put<{ role: string }>(`http://localhost:3000/api/users/${userId}`, { role: newRole })
+  // Change a user's role by their username
+  changeUserRole(username: string, newRole: string) {
+    this.http.put<{ role: string }>(`http://localhost:3000/api/users/${username}/role`, { newRole })
       .subscribe(
         (response) => {
-          const user = this.users.find(u => u.id === userId);
+          const user = this.users.find(u => u.username === username);
           if (user) {
             user.role = response.role;
           }
@@ -60,47 +60,66 @@ export class SuperAdminDashboardComponent implements OnInit {
         }
       );
   }
-
   // Delete a chat group by its ID
-  deleteChatGroup(groupId: number) {
-    this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(() => {
-      this.chatGroups = this.chatGroups.filter(group => group.id !== groupId);
-    });
+  deleteChatGroup(groupId: string) {
+    this.http.delete(`http://localhost:3000/api/chat-groups/${groupId}`).subscribe(
+      () => {
+        this.chatGroups = this.chatGroups.filter((group) => group._id !== groupId);
+        console.log('Group deleted successfully');
+      },
+      (error) => {
+        console.error('An error occurred', error);
+        // Optionally: Notify the user about the error
+      }
+    );
   }
 
   // Add a user to a chat group
-  addUserToChatGroup(groupId: number, username: string) {
-    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/add-user`, { username })
-      .subscribe(
-        (response) => {
-          const group = this.chatGroups.find(g => g.id === groupId);
-          if (group) {
-            group.usernames.push(username);
-          }
-        },
-        (error) => {
-          console.log('An error occurred', error);
-        }
-      );
-  }
+  addUserToChatGroup(groupId: string, username: string) {
+    // Check if groupId and username are defined and non-empty
+    if (!groupId || !username) {
+      console.error('GroupId or Username is not defined');
+      // Optionally: Notify the user about the error
+      return;
+    }
 
+    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/add-user`, { username }).subscribe(
+      (response: any) => {
+        const group = this.chatGroups.find((group) => group._id === groupId);
+        if (group) {
+          group.usernames.push(username);
+          console.log('User added successfully');
+        }
+      },
+      (error) => {
+        console.error('An error occurred', error);
+        // Optionally: Notify the user about the error
+      }
+    );
+  }
   // Remove a user from a chat group
-  removeUserFromChatGroup(groupId: number, username: string) {
-    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/remove-user`, { username })
-      .subscribe(
-        (response) => {
-          const group = this.chatGroups.find(g => g.id === groupId);
-          if (group) {
-            const index = group.usernames.indexOf(username);
-            if (index > -1) {
-              group.usernames.splice(index, 1);
-            }
-          }
-        },
-        (error) => {
-          console.log('An error occurred', error);
-        }
-      );
-  }
+  removeUserFromChatGroup(groupId: string, username: string) {
+    if (!groupId || !username) {
+      console.error('GroupId or Username is not defined');
+      // Optionally: Notify the user about the error
+      return;
+    }
 
+    this.http.put(`http://localhost:3000/api/chat-groups/${groupId}/remove-user`, { username }).subscribe(
+      (response: any) => {
+        const group = this.chatGroups.find((group) => group._id === groupId);
+        if (group) {
+          const index = group.usernames.indexOf(username);
+          if (index > -1) {
+            group.usernames.splice(index, 1);
+            console.log('User removed successfully');
+          }
+        }
+      },
+      (error) => {
+        console.error('An error occurred', error);
+        // Optionally: Notify the user about the error
+      }
+    );
+  }
 }

@@ -110,3 +110,8 @@
   padding: 12px 24px;
   cursor: pointer;
 }
+
+.avatar {
+  border-radius: 50%;
+  /*... Other stylings...*/
+}
