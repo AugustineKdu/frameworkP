@@ -1,29 +1,21 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
+
   constructor(private http: HttpClient) { }
 
-  createGroupChannel(channelName: string, userIds: string[]) {
-    return this.http.post('/api/createGroupChannel', { channelName, userIds });
+  // 채팅 그룹 생성 API 호출
+  createGroupChannel(channelName: string, userIds: string[]): Observable<any> {
+    return this.http.post('http://localhost:3000/api/chat-groups', { name: channelName, userIds });
   }
 
-  getMyGroupChannels() {
-    return this.http.get('/api/getMyGroupChannels');
-  }
-
-  // 로컬 저장소에 채널 정보 저장
-  saveChannelsToLocalStorage(channels: any[]) {
-    localStorage.setItem('channels', JSON.stringify(channels));
-  }
-
-  // 로컬 저장소에서 채널 정보 불러오기
-  loadChannelsFromLocalStorage(): any[] {
-    const channels = localStorage.getItem('channels');
-    return channels ? JSON.parse(channels) : [];
+  // 사용자의 모든 채팅 그룹을 가져오는 API 호출
+  getMyGroupChannels(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:3000/api/chat-groups');
   }
 }

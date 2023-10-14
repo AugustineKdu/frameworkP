@@ -26,9 +26,7 @@ const peerServer = PeerServer({
     path: '/myapp'
 });
 
-
 app.use(express.json());
-
 const initialUsers = [
     { username: 'user', email: 'user@example.com', password: '123', role: 'user', valid: true },
     { username: 'group', email: 'groupadmin@example.com', password: '123', role: 'group-admin', valid: true },
@@ -36,7 +34,7 @@ const initialUsers = [
 ];
 const initialChatGroups = [
     {
-        id: '1',
+        _id: '1',
         name: 'General',
         messages: [
             { sender: 'user1', content: 'Hello everyone!', timestamp: new Date() },
@@ -46,7 +44,7 @@ const initialChatGroups = [
         usernames: ['user', 'group', 'super']
     },
     {
-        id: '2',
+        _id: '2',
         name: 'General22222222',
         messages: [
             { sender: 'user1', content: 'Hello everyone!', timestamp: new Date() },
@@ -65,7 +63,7 @@ async function initializeDatabase() {
 
         // Check if 'users' and 'groups' collections are empty
         const usersCount = await db.collection('users').countDocuments({});
-        const groupsCount = await db.collection('chatgroups').countDocuments({});
+        const groupsCount = await db.collection('chatGroups').countDocuments({});
 
         // If they are empty, insert the initial users and groups
         if (usersCount === 0) {
@@ -73,7 +71,7 @@ async function initializeDatabase() {
         }
 
         if (groupsCount === 0) {
-            await db.collection('chatGroups').insertMany(initialGroups);
+            await db.collection('chatGroups').insertMany(initialChatGroups);
         }
 
         console.log("Database has been checked and initialized if needed");
@@ -86,11 +84,11 @@ async function initializeDatabase() {
 initializeDatabase();
 async function loadSampleData(db) {
     try {
-        // 1. 데이터베이스 클리어 (옵션)
+
         await db.collection('users').deleteMany({});
         await db.collection('chatGroups').deleteMany({});
 
-        // 2. 고유성 확인 및 데이터 삽입
+
         for (const user of initialUsers) {
             const existingUser = await db.collection('users').findOne({ username: user.username });
             if (!existingUser) {
@@ -99,9 +97,9 @@ async function loadSampleData(db) {
         }
 
         for (const group of initialChatGroups) {
-            const existingChatGroup = await db.collection('chatGroups').findOne({ _id: chatGroups._id });
+            const existingChatGroup = await db.collection('chatGroups').findOne({ _id: group.id });
             if (!existingChatGroup) {
-                await db.collection('chatGroups').insertOne(chatGroups);
+                await db.collection('chatGroups').insertOne(group);
             }
         }
 
@@ -110,6 +108,7 @@ async function loadSampleData(db) {
         console.error("An error occurred while loading the sample data:", err);
     }
 }
+
 async function startServer() {
     const client = await MongoClient.connect(uri);
     console.log("Connected to the database");
@@ -123,10 +122,10 @@ async function startServer() {
     await loadSampleData(db);
     async function migrateData(db) {
         try {
-            const groups = await db.collection('groups').find().toArray();
+            const groups = await db.collection('chatGroups').find().toArray();
             for (const group of groups) {
                 const usernames = [...new Set([...(group.members || []), ...(group.admins || [])])];
-                await db.collection('groups').updateOne(
+                await db.collection('chatGroups').updateOne(
                     { _id: group._id },
                     { $set: { usernames } }
                 );
@@ -147,7 +146,7 @@ async function startServer() {
     server.listen(port, () => {
         console.log(`Server running on http://localhost:${port}`);
     });
-
+    //Authentication APIs
     app.post('/api/auth', async (req, res) => {
         const { username, password } = req.body;
 
@@ -183,7 +182,7 @@ async function startServer() {
         }
     });
     const INTERNAL_SERVER_ERROR_MSG = 'Internal Server Error';
-
+    //User APIs
     app.put('/api/users/:id/role', async (req, res) => {
         const { id } = req.params;
         const { newRole } = req.body;
@@ -256,6 +255,34 @@ async function startServer() {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     });
+    app.get('/api/users', async (req, res) => {
+        try {
+            const users = await db.collection('users').find().toArray();
+            const groups = await db.collection('groups').find().toArray();
+
+            // 로깅을 추가하여 어떤 그룹이 usernames 속성을 가지고 있지 않은지 확인
+            groups.forEach((group, index) => {
+                if (!group.usernames) {
+                    console.error(`Group at index ${index} does not have a usernames property`, group);
+                }
+            });
+
+            const usersWithGroups = users.map(user => {
+                // Safe navigation to avoid error if usernames is not defined
+                const userGroups = groups.filter(group => group.usernames?.includes(user.username));
+                return {
+                    ...user,
+                    groups: userGroups.map(group => ({ _id: group._id, name: group.name }))
+                };
+            });
+
+            res.json(usersWithGroups);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+    //image control APIs
     app.post('/upload-avatar', (req, res) => {
         if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).send('No files were uploaded.');
@@ -289,34 +316,89 @@ async function startServer() {
             res.send('File uploaded!');
         });
     });
+    //ChatGroup APIs
+
+    // API to get all chat groups
+    app.get('/api/chat-groups', async (req, res) => {
+        try {
+            const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+            const db = client.db(dbName);
+            const chatGroups = await db.collection('chatGroups').find().toArray();
+            res.json(chatGroups);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    // API to add a new chat group
+    app.post('/api/chat-groups', async (req, res) => {
+        const newGroup = {
+            name: req.body.name,
+            messages: [],
+            usernames: req.body.usernames || []
+        };
+        try {
+            const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+            const db = client.db(dbName);
+            const result = await db.collection('chatGroups').insertOne(newGroup);
+            res.json(result.ops[0]);  // Return the new chat group
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+    // API to delete a chat group
+    app.delete('/api/chat-groups/:id', async (req, res) => {
+        const _id = req.params.id;
+        try {
+            const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+            const db = client.db(dbName);
+            const result = await db.collection('chatGroups').deleteOne({ _id: new MongoClient.ObjectId(_id) });
+            if (result.deletedCount === 1) {
+                res.json({ success: true });
+            } else {
+                res.status(404).json({ success: false });
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+
+
 
     io.on('connection', (socket) => {
         console.log('New user connected');
 
-        socket.on('joinRoom', (_id) => {
+        socket.on('joinRoom', (roomId) => {
             socket.join(roomId);
-            console.log(`User ${socket.id} joined room ${_id}`);
         });
 
-        socket.on('leaveRoom', (roo_idmId) => {
-            socket.leave(_id);
-            console.log(`User ${socket.id} left room ${_id}`);
+        socket.on('leaveRoom', (roomId) => {
+            socket.leave(roomId);
         });
 
-        socket.on('send message', (data) => {
-            const { message, _id } = data;
-            const group = chatGroups.find(group => group.id === parseInt(_id));
-
-            if (group) {
-                group.messages.push({ content: message });
-                io.to(_id).emit('new message', { _id, message });
-            } else {
-                // Emit an error if the group is not found
-                socket.emit('error', 'Group not found');
+        socket.on('send message', async (data) => {
+            const { message, roomId } = data;
+            try {
+                // Add the message to the database
+                const result = await db.collection('chatGroups').updateOne(
+                    { _id: new MongoClient.ObjectId(roomId) },
+                    { $push: { messages: message } }
+                );
+                // Emit the message to other users in the room
+                io.to(roomId).emit('new message', { roomId, message });
+            } catch (error) {
+                console.error(error);
+                socket.emit('error', 'Internal Server Error');
             }
         });
+
+
         socket.on('disconnect', () => {
-            console.log(`User ${socket.id} disconnected`);
+            console.log(`User disconnected`);
         });
     });
 }
